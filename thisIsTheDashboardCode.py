@@ -58,17 +58,21 @@ class ThisIsTheDashboardApp:
 
         switchFrame = Frame(leftFrame, borderwidth=3, relief=SUNKEN,
                             padx=5, pady=5)
-        switchFrame.pack(side=TOP)
+        switchFrame.pack(side=TOP, fill=X)
 
         self.switchVars = { }
 
         for switch in switches:
             var = IntVar()
             self.switchVars[switch] = var
-            checkbutton = Checkbutton(switchFrame, text=switch,
+
+            checkbuttonFrame = Frame(switchFrame)
+            checkbuttonFrame.pack(side=TOP, fill=X)
+            
+            checkbutton = Checkbutton(checkbuttonFrame, text=switch,
                                       font=("Helvetica", 16),
                                       variable=var)
-            checkbutton.pack(side=TOP)
+            checkbutton.pack(side=LEFT)
 
         self.connectButton = Button(leftFrame, height=2, text="Connect",
                                font=("Helvetica", 16),
@@ -171,5 +175,8 @@ class ThisIsTheDashboardApp:
         return colorHex
 
 root = Tk()
-app = ThisIsTheDashboardApp(root, switches=['123', '456', '789'])
+app = ThisIsTheDashboardApp(root, switches=['Start in Voltage',
+                                            'Auto shoot enabled',
+                                            'Do something',
+                                            'This is a switch'])
 root.mainloop()
