@@ -12,6 +12,7 @@ class RobotConnection:
         self.table = NetworkTables.getTable('dashboard')
 
     def isConnected(self):
+        # TODO
         return True
 
     def disconnect(self):
