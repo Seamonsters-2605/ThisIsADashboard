@@ -2,6 +2,7 @@ __author__ = "jacobvanthoog"
 
 from tkinter import *
 import hashlib
+from tkinter import filedialog
 import colorsys
 from networktables import NetworkTables
 
@@ -62,7 +63,7 @@ class ThisIsTheDashboardApp:
 
         self.switchVars = { }
 
-        for switch in switches:
+        for switch, enabled in switches.items():
             var = IntVar()
             self.switchVars[switch] = var
 
@@ -72,6 +73,8 @@ class ThisIsTheDashboardApp:
             checkbutton = Checkbutton(checkbuttonFrame, text=switch,
                                       font=("Helvetica", 16),
                                       variable=var)
+            if enabled:
+                checkbutton.select()
             checkbutton.pack(side=LEFT)
 
         self.connectButton = Button(leftFrame, height=2, text="Connect",
@@ -175,8 +178,21 @@ class ThisIsTheDashboardApp:
         return colorHex
 
 root = Tk()
-app = ThisIsTheDashboardApp(root, switches=['Start in Voltage',
-                                            'Auto shoot enabled',
-                                            'Do something',
-                                            'This is a switch'])
+file = filedialog.askopenfile()
+content = file.readlines()
+switchnames = {}
+for line in content:
+    line = line.strip()
+    if len(line) == 0:
+        continue
+    firstcharacter = line[0]
+    if firstcharacter == "+":
+        switchenabled = True
+
+    if firstcharacter == "-":
+        switchenabled = False
+
+    switchname = line[1:]
+    switchnames[switchname] = switchenabled
+app = ThisIsTheDashboardApp(root, switches = switchnames)
 root.mainloop()
