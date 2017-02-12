@@ -13,8 +13,8 @@ class RobotConnection:
         self.table = NetworkTables.getTable('dashboard')
 
     def isConnected(self):
-        # TODO
-        return True
+        # TODO: test this!
+        return NetworkTables.isConnected()
 
     def disconnect(self):
         NetworkTables.shutdown()
@@ -104,15 +104,18 @@ class ThisIsTheDashboardApp:
                 self._connected()
                 self._updateLogStates()
             else:
+                self.robotConnection.disconnect()
                 self._disconnectedError()
         except BaseException as e:
             print(e)
+            self.robotConnection.disconnect()
             self._disconnectedError()
 
     def _disconnectButtonPressed(self):
         if self.robotConnection is None:
             return
         if not self.robotConnection.isConnected():
+            self.robotConnection.disconnect()
             self._disconnectedError()
             return
         self.robotConnection.disconnect()
@@ -147,6 +150,7 @@ class ThisIsTheDashboardApp:
         if self.robotConnection is None:
             return
         if not self.robotConnection.isConnected():
+            self.robotConnection.disconnect()
             self._disconnectedError()
             return
         logStates = self.robotConnection.getLogStates()
