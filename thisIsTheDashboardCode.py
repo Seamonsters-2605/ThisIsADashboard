@@ -249,7 +249,9 @@ def readSwitchConfig(file):
 
 if __name__ == "__main__":
     root = Tk()
-    file = filedialog.askopenfile()
+    file = filedialog.askopenfile(title="Choose a switches file...",
+                                  filetypes=[('Text Files', '*.txt'),
+                                             ('All Files', '*')])
     if file == None:
         exit()
     switches = readSwitchConfig(file)
