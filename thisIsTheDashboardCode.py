@@ -6,6 +6,8 @@ from tkinter import filedialog
 import colorsys
 from networktables import NetworkTables
 
+TEST_MODE = False
+
 class RobotConnection:
 
     def __init__(self):
@@ -36,6 +38,30 @@ class RobotConnection:
         switchValues = [value for name, value in switches.items()]
         self.table.putStringArray('switchnames', switchNames)
         self.table.putBooleanArray('switchvalues', switchValues)
+
+
+class TestRobotConnection:
+
+    def __init__(self):
+        print("Initialized test connection")
+        print("You're not actually connected to the robot!")
+        self.testNumber = 0
+
+    def isConnected(self):
+        return True
+
+    def disconnect(self):
+        print("Test connection: Disconnect")
+
+    def getLogStates(self):
+        self.testNumber += 1
+        return {'Test number': str(self.testNumber),
+                'abc': "123",
+                'This is a long key name': "This is a long value"}
+
+    def sendSwitchData(self, switches):
+        print(switches)
+
 
 class ThisIsTheDashboardApp:
 
@@ -97,8 +123,12 @@ class ThisIsTheDashboardApp:
         self.logStateLabels = { }
 
     def _connectButtonPressed(self):
+        global TEST_MODE
         try:
-            self.robotConnection = RobotConnection()
+            if TEST_MODE:
+                self.robotConnection = TestRobotConnection()
+            else:
+                self.robotConnection = RobotConnection()
             if self.robotConnection.isConnected():
                 self._sendSwitchData()
                 self._connected()
