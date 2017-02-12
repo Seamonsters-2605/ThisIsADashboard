@@ -250,6 +250,8 @@ def readSwitchConfig(file):
 if __name__ == "__main__":
     root = Tk()
     file = filedialog.askopenfile()
+    if file == None:
+        exit()
     switches = readSwitchConfig(file)
     app = ThisIsTheDashboardApp(root, switches = switches)
     root.mainloop()
