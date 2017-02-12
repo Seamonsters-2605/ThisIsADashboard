@@ -8,10 +8,12 @@ class DashboardTestRobot(wpilib.IterativeRobot):
         self.testNumber = 0
 
     def teleopInit(self):
-        print(self.table.getStringArray('switchnames'))
-        print(self.table.getBooleanArray('switchvalues'))
+        pass
 
     def teleopPeriodic(self):
+        print(self.table.getStringArray('switchnames'))
+        print(self.table.getBooleanArray('switchvalues'))
+        
         self.table.putStringArray('logstatenames', ['abc','def','test'])
         self.table.putStringArray('logstatevalues', ['123','456',
                                                      str(self.testNumber)])

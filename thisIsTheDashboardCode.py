@@ -15,7 +15,6 @@ class RobotConnection:
         self.table = NetworkTables.getTable('dashboard')
 
     def isConnected(self):
-        # TODO: test this!
         return NetworkTables.isConnected()
 
     def disconnect(self):
@@ -69,6 +68,7 @@ class ThisIsTheDashboardApp:
     DISCONNECTED_COLOR = "#AAAAAA"
     CONNECTED_COLOR = "#55FF55"
     ERROR_COLOR = "#FF0000"
+    WAIT_COLOR = "#FFFF00"
 
     LOG_STATE_FONT = ("Helvetica", 24)
     IMPORTANT_LOG_STATE_FONT = ("Helvetica", 24, "bold underline")
@@ -134,15 +134,29 @@ class ThisIsTheDashboardApp:
                 self.robotConnection = TestRobotConnection()
             else:
                 self.robotConnection = RobotConnection()
+            self._waiting()
+            self.waitCount = 0
+            self._waitForConnection()
+        except BaseException as e:
+            print("Exception:", e)
+            self.robotConnection.disconnect()
+            self._disconnectedError()
+
+    def _waitForConnection(self):
+        if self.waitCount > 10:
+            self.robotConnection.disconnect()
+            self._disconnectedError()
+            return
+        self.waitCount += 1
+        try:
             if self.robotConnection.isConnected():
                 self._sendSwitchData()
                 self._connected()
                 self._updateLogStates()
             else:
-                self.robotConnection.disconnect()
-                self._disconnectedError()
+                self.root.after(500, self._waitForConnection)
         except BaseException as e:
-            print(e)
+            print("Exception:", e)
             self.robotConnection.disconnect()
             self._disconnectedError()
 
@@ -161,6 +175,11 @@ class ThisIsTheDashboardApp:
                                   state=DISABLED)
         self.disconnectButton.config(state=NORMAL)
 
+    def _waiting(self):
+        self.connectButton.config(bg=ThisIsTheDashboardApp.WAIT_COLOR,
+                                  state=DISABLED)
+        self.disconnectButton.config(state=DISABLED)
+
     def _disconnectedSuccess(self):
         self.robotConnection = None
         self.connectButton.config(bg=ThisIsTheDashboardApp.DISCONNECTED_COLOR,
@@ -176,6 +195,8 @@ class ThisIsTheDashboardApp:
             self.connectButton.flash()
 
     def _sendSwitchData(self):
+        if self.robotConnection == None:
+            return
         switches = { }
         for name, var in self.switchVars.items():
             switches[name] = var.get() == 1
