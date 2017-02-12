@@ -72,6 +72,7 @@ class ThisIsTheDashboardApp:
 
     LOG_STATE_FONT = ("Helvetica", 24)
     IMPORTANT_LOG_STATE_FONT = ("Helvetica", 24, "bold underline")
+    CONNECT_BUTTON_FONT = ("Helvetica", 16)
 
     def __init__(self, root, switches):
         self.robotConnection = None
@@ -109,13 +110,13 @@ class ThisIsTheDashboardApp:
             checkbutton.pack(side=LEFT)
 
         self.connectButton = Button(leftFrame, height=2, text="Connect",
-                               font=("Helvetica", 16),
+                               font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
                                command = self._connectButtonPressed,
                                bg=ThisIsTheDashboardApp.DISCONNECTED_COLOR)
         self.connectButton.pack(side=TOP, fill=X)
         self.disconnectButton = Button(leftFrame, height=2, text="Disconnect",
-                                    font=("Helvetica", 16), state=DISABLED,
-                                    command = self._disconnectButtonPressed)
+            font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT, state=DISABLED,
+            command = self._disconnectButtonPressed)
         self.disconnectButton.pack(side=TOP, fill=X)
 
         separator = Frame(frame, width=12)
