@@ -202,7 +202,7 @@ class ThisIsTheDashboardApp:
         self.root.after(100, self._updateLogStates)
 
     def _addLogStateLabel(self, name):
-        color = self._getLogStateColor(name)
+        color = _getLogStateColor(name)
         
         stateFrame = Frame(self.logFrame, bg=color,
                            borderwidth=3, relief=GROOVE)
@@ -217,14 +217,14 @@ class ThisIsTheDashboardApp:
 
         self.logStateLabels[name] = valueLabel
 
-    def _getLogStateColor(self, title):
-        titleHash = hashlib.sha256()
-        titleHash.update(title.encode('utf-8'))
-        hashValue = titleHash.digest()
-        hue = hashValue[0]
-        r,g,b = colorsys.hsv_to_rgb(float(hue)/256.0, 0.7, 1.0)
-        colorHex = '#%02x%02x%02x' % (int(r*255), int(g*255), int(b*255))
-        return colorHex
+def _getLogStateColor(title):
+    titleHash = hashlib.sha256()
+    titleHash.update(title.encode('utf-8'))
+    hashValue = titleHash.digest()
+    hue = hashValue[0]
+    r,g,b = colorsys.hsv_to_rgb(float(hue)/256.0, 0.7, 1.0)
+    colorHex = '#%02x%02x%02x' % (int(r*255), int(g*255), int(b*255))
+    return colorHex
 
 def readSwitchConfig(file):
     content = file.readlines()
