@@ -225,26 +225,31 @@ class ThisIsTheDashboardApp:
         colorHex = '#%02x%02x%02x' % (int(r*255), int(g*255), int(b*255))
         return colorHex
 
-root = Tk()
-file = filedialog.askopenfile()
-content = file.readlines()
-switchNames = {}
-for line in content:
-    line = line.strip()
-    if len(line) == 0:
-        continue
-    switchName = line[1:]
-    firstCharacter = line[0]
+def readSwitchConfig(file):
+    content = file.readlines()
+    switchNames = {}
+    for line in content:
+        line = line.strip()
+        if len(line) == 0:
+            continue
+        switchName = line[1:]
+        firstCharacter = line[0]
 
-    if firstCharacter == "+":
-        switchEnabled = True
-    elif firstCharacter == "-":
-        switchEnabled = False
-    else:
-        switchName = line
-        print("Switch", switchName, "doesn't have enabled state!")
-        switchEnabled = False
+        if firstCharacter == "+":
+            switchEnabled = True
+        elif firstCharacter == "-":
+            switchEnabled = False
+        else:
+            switchName = line
+            print("Switch", switchName, "doesn't have enabled state!")
+            switchEnabled = False
 
-    switchNames[switchName] = switchEnabled
-app = ThisIsTheDashboardApp(root, switches = switchNames)
-root.mainloop()
+        switchNames[switchName] = switchEnabled
+    return switchNames
+
+if __name__ == "__main__":
+    root = Tk()
+    file = filedialog.askopenfile()
+    switches = readSwitchConfig(file)
+    app = ThisIsTheDashboardApp(root, switches = switches)
+    root.mainloop()
