@@ -228,19 +228,23 @@ class ThisIsTheDashboardApp:
 root = Tk()
 file = filedialog.askopenfile()
 content = file.readlines()
-switchnames = {}
+switchNames = {}
 for line in content:
     line = line.strip()
     if len(line) == 0:
         continue
-    firstcharacter = line[0]
-    if firstcharacter == "+":
-        switchenabled = True
+    switchName = line[1:]
+    firstCharacter = line[0]
 
-    if firstcharacter == "-":
-        switchenabled = False
+    if firstCharacter == "+":
+        switchEnabled = True
+    elif firstCharacter == "-":
+        switchEnabled = False
+    else:
+        switchName = line
+        print("Switch", switchName, "doesn't have enabled state!")
+        switchEnabled = False
 
-    switchname = line[1:]
-    switchnames[switchname] = switchenabled
-app = ThisIsTheDashboardApp(root, switches = switchnames)
+    switchNames[switchName] = switchEnabled
+app = ThisIsTheDashboardApp(root, switches = switchNames)
 root.mainloop()
