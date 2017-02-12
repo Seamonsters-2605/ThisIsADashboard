@@ -199,7 +199,7 @@ class ThisIsTheDashboardApp:
                     font=ThisIsTheDashboardApp.IMPORTANT_LOG_STATE_FONT)
             else:
                 label.config(font=ThisIsTheDashboardApp.LOG_STATE_FONT)
-        self.root.after(100, self._updateLogStates)
+        self.root.after(400, self._updateLogStates)
 
     def _addLogStateLabel(self, name):
         color = _getLogStateColor(name)
