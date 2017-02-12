@@ -57,7 +57,8 @@ class TestRobotConnection:
         self.testNumber += 1
         return {'Test number': str(self.testNumber),
                 'abc': "123",
-                'This is a long key name': "This is a long value"}
+                'This is a long key name': "This is a long value",
+                'Key': "This value is important!"}
 
     def sendSwitchData(self, switches):
         print(switches)
@@ -68,6 +69,9 @@ class ThisIsTheDashboardApp:
     DISCONNECTED_COLOR = "#AAAAAA"
     CONNECTED_COLOR = "#55FF55"
     ERROR_COLOR = "#FF0000"
+
+    LOG_STATE_FONT = ("Helvetica", 24)
+    IMPORTANT_LOG_STATE_FONT = ("Helvetica", 24, "bold underline")
 
     def __init__(self, root, switches):
         self.robotConnection = None
@@ -187,7 +191,13 @@ class ThisIsTheDashboardApp:
         for name, value in logStates.items():
             if name not in self.logStateLabels:
                 self._addLogStateLabel(name)
-            self.logStateLabels[name].config(text=value)
+            label = self.logStateLabels[name]
+            label.config(text=value)
+            if value.endswith('!'):
+                label.config(
+                    font=ThisIsTheDashboardApp.IMPORTANT_LOG_STATE_FONT)
+            else:
+                label.config(font=ThisIsTheDashboardApp.LOG_STATE_FONT)
         self.root.after(100, self._updateLogStates)
 
     def _addLogStateLabel(self, name):
@@ -198,10 +208,10 @@ class ThisIsTheDashboardApp:
         stateFrame.pack(side=TOP, fill=X)
         
         titleLabel = Label(stateFrame, text=name + ":",
-                           font=("Helvetica", 24), bg=color)
+                           font=ThisIsTheDashboardApp.LOG_STATE_FONT, bg=color)
         titleLabel.pack(side=LEFT)
         valueLabel = Label(stateFrame, text="None",
-                           font=("Helvetica", 24), bg=color)
+                           font=ThisIsTheDashboardApp.LOG_STATE_FONT, bg=color)
         valueLabel.pack(side=LEFT)
 
         self.logStateLabels[name] = valueLabel
