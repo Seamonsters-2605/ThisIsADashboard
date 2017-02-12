@@ -72,7 +72,8 @@ class ThisIsTheDashboardApp:
             
             checkbutton = Checkbutton(checkbuttonFrame, text=switch,
                                       font=("Helvetica", 16),
-                                      variable=var)
+                                      variable=var,
+                                      command=self._sendSwitchData)
             if enabled:
                 checkbutton.select()
             checkbutton.pack(side=LEFT)
@@ -99,10 +100,7 @@ class ThisIsTheDashboardApp:
         try:
             self.robotConnection = RobotConnection()
             if self.robotConnection.isConnected():
-                switches = { }
-                for name, var in self.switchVars.items():
-                    switches[name] = var.get() == 1
-                self.robotConnection.sendSwitchData(switches)
+                self._sendSwitchData()
                 self._connected()
                 self._updateLogStates()
             else:
@@ -138,6 +136,12 @@ class ThisIsTheDashboardApp:
         self.disconnectButton.config(state=DISABLED)
         for i in range(0, 3):
             self.connectButton.flash()
+
+    def _sendSwitchData(self):
+        switches = { }
+        for name, var in self.switchVars.items():
+            switches[name] = var.get() == 1
+        self.robotConnection.sendSwitchData(switches)
 
     def _updateLogStates(self):
         if self.robotConnection is None:
