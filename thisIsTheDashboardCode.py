@@ -119,20 +119,20 @@ class ThisIsTheDashboardApp:
         self._disconnectedSuccess()
 
     def _connected(self):
-        self.connectButton.config(bg=ThisIsTheDashboardApp.CONNECTED_COLOR)
-        self.connectButton.config(state=DISABLED)
+        self.connectButton.config(bg=ThisIsTheDashboardApp.CONNECTED_COLOR,
+                                  state=DISABLED)
         self.disconnectButton.config(state=NORMAL)
 
     def _disconnectedSuccess(self):
-        self.connectButton.config(bg=ThisIsTheDashboardApp.DISCONNECTED_COLOR)
         self.robotConnection = None
-        self.connectButton.config(state=NORMAL)
+        self.connectButton.config(bg=ThisIsTheDashboardApp.DISCONNECTED_COLOR,
+                                  state=NORMAL)
         self.disconnectButton.config(state=DISABLED)
 
     def _disconnectedError(self):
-        self.connectButton.config(bg=ThisIsTheDashboardApp.ERROR_COLOR)
         self.robotConnection = None
-        self.connectButton.config(state=NORMAL)
+        self.connectButton.config(bg=ThisIsTheDashboardApp.ERROR_COLOR,
+                                  state=NORMAL)
         self.disconnectButton.config(state=DISABLED)
         for i in range(0, 3):
             self.connectButton.flash()
