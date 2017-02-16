@@ -3,9 +3,10 @@ __author__ = "jacobvanthoog"
 from tkinter import *
 import hashlib
 from tkinter import filedialog
+from tkinter import messagebox
 import colorsys
 from networktables import NetworkTables
-import os
+import subprocess
 
 
 TEST_MODE = False
@@ -148,7 +149,14 @@ class ThisIsTheDashboardApp:
             self._disconnectedError()
 
     def shutdownButtonPressed(self):
-        os.system("plink.exe -ssh pi@raspberrypi -pw sehome \"sudo shutdown -h now\"")
+        try:
+            subprocess.run("plink.exe -ssh pi@raspberrypi -pw sehome \"sudo shutdown -h now\"",
+                           check=True)
+        except BaseException as e:
+            messagebox.showerror(
+                "Error while shutting down",
+                str(e)
+            )
 
     def _waitForConnection(self):
         if self.waitCount > 10:
