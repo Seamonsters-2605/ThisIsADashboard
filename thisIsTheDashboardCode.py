@@ -5,13 +5,15 @@ import hashlib
 from tkinter import filedialog
 import colorsys
 from networktables import NetworkTables
+import os
+
 
 TEST_MODE = False
 
 class RobotConnection:
 
     def __init__(self):
-        NetworkTables.initialize(server="roborio-2605-frc.local")
+        NetworkTables.initialize(server="roborio-2605-frc")
         self.table = NetworkTables.getTable('dashboard')
 
     def isConnected(self):
@@ -77,7 +79,6 @@ class ThisIsTheDashboardApp:
     def __init__(self, root, switches):
         self.robotConnection = None
         self._buildUI(root, switches)
-
     def _buildUI(self, root, switches):
         self.root = root
         root.title("Seamonsters Dashboard!")
@@ -119,6 +120,10 @@ class ThisIsTheDashboardApp:
             command = self._disconnectButtonPressed)
         self.disconnectButton.pack(side=TOP, fill=X)
 
+        self.shutdown = Button(leftFrame, height=2, text="Shut Down Pi",
+                                font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
+                                command = self.shutdownButtonPressed)
+        self.shutdown.pack(side=TOP, fill= X)
         separator = Frame(frame, width=12)
         separator.pack(side=LEFT)
 
@@ -141,6 +146,9 @@ class ThisIsTheDashboardApp:
             print("Exception:", e)
             self.robotConnection.disconnect()
             self._disconnectedError()
+
+    def shutdownButtonPressed(self):
+        os.system("plink.exe -ssh pi@raspberrypi -pw sehome \"sudo shutdown -h now\"")
 
     def _waitForConnection(self):
         if self.waitCount > 10:
