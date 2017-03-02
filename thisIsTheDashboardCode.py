@@ -166,10 +166,20 @@ class ThisIsTheDashboardApp:
     def shutdownButtonPressed(self):
         try:
             subprocess.run("plink.exe -ssh pi@raspberrypi -pw sehome \"sudo shutdown -h now\"",
-                           check=True)
-        except BaseException as e:
+                           check=True, stderr=subprocess.PIPE)
+        except subprocess.CalledProcessError as e:
+            error = e.stderr
+            if error == None:
+                error = ""
+            else:
+                error = error.decode("utf-8")
             messagebox.showerror(
                 "Error while shutting down",
+                error
+            )
+        except BaseException as e:
+            messagebox.showerror(
+                "Unrecognized error while shutting down",
                 str(e)
             )
 
