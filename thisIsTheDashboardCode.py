@@ -138,7 +138,7 @@ class ThisIsTheDashboardApp:
         canvas = Canvas(frame)
 
         canvas.create_line(30,100,30,200)
-        canvas.create_line(30,200,70,200)ss
+        canvas.create_line(30,200,70,200)
         canvas.create_line(150,100,150,200)
         canvas.create_line(150,200,190,200)
 
