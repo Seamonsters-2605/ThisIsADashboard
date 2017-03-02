@@ -9,6 +9,7 @@ from networktables import NetworkTables
 import subprocess
 
 
+
 TEST_MODE = False
 
 class RobotConnection:
@@ -132,6 +133,20 @@ class ThisIsTheDashboardApp:
         self.logFrame.pack(side=LEFT, fill=X, expand=True)
         
         self.logStateLabels = { }
+
+
+        canvas = Canvas(frame)
+
+        canvas.create_line(30,100,30,200)
+        canvas.create_line(30,200,70,200)
+        canvas.create_oval(80,100,120,200)
+        canvas.create_line(150,100,150,200)
+        canvas.create_line(150,200,190,200)
+
+
+
+        canvas.pack()
+
 
     def _connectButtonPressed(self):
         global TEST_MODE
