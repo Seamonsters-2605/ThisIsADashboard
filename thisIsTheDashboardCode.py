@@ -35,6 +35,46 @@ class RobotConnection:
         except BaseException:
             return { }
 
+    def getContours(self):
+        """
+        A coordinate is a tuple of 2 values. A contour is a list of coordinates.
+        This function returns a list of contours - so a list of lists of tuples.
+        """
+        try:
+            return self._readContours(self.contoursTable.getNumberArray('x'),
+                                       self.contoursTable.getNumberArray('y'))
+        except BaseException:
+            print("Vision connection error!")
+            return [ ]
+
+    def _readContours(self, xCoords, yCoords):
+        # check data
+        if len(xCoords) != len(yCoords):
+            print("ERROR: Incorrect contour data! "
+                  "len(xCoords) != len(yCoords)")
+            return []
+        numContours = xCoords.count(-1)
+        if numContours != yCoords.count(-1):
+            print("ERROR: Incorrect contour data! "
+                  "xCoords.count(-1) != yCoords.count(-1)")
+            return []
+
+        contours = []
+        currentContour = []
+        for i in range(0, len(xCoords)):
+            x = xCoords[i]
+            y = yCoords[i]
+            if x == -1:
+                if len(currentContour) != 0:
+                    contours.append(currentContour)
+                currentContour = []
+            else:
+                currentContour.append((x, y))
+        if len(currentContour) != 0:
+            contours.append(currentContour)
+
+        return contours
+
     def sendSwitchData(self, switches):
         print(switches)
         switchNames = [name for name, value in switches.items()]
@@ -62,6 +102,10 @@ class TestRobotConnection:
                 'abc': "123",
                 'This is a long key name': "This is a long value",
                 'Key': "This value is important!"}
+
+    def getContours(self):
+        return [ [(30, 100), (30, 200), (70, 200)],
+                 [(150, 100), (150, 200), (190, 200)] ]
 
     def sendSwitchData(self, switches):
         print(switches)
@@ -135,16 +179,8 @@ class ThisIsTheDashboardApp:
         self.logStateLabels = { }
 
 
-        canvas = Canvas(frame)
-
-        canvas.create_line(30,100,30,200)
-        canvas.create_line(30,200,70,200)
-        canvas.create_line(150,100,150,200)
-        canvas.create_line(150,200,190,200)
-
-
-
-        canvas.pack()
+        self.canvas = Canvas(frame, width=640, height=480)
+        self.canvas.pack()
 
 
     def _connectButtonPressed(self):
@@ -260,6 +296,19 @@ class ThisIsTheDashboardApp:
                     font=ThisIsTheDashboardApp.IMPORTANT_LOG_STATE_FONT)
             else:
                 label.config(font=ThisIsTheDashboardApp.LOG_STATE_FONT)
+
+        # update contours
+        self.canvas.delete("all")
+        contours = self.robotConnection.getContours()
+        for contourPoints in contours:
+            if len(contourPoints) < 2:
+                continue
+            for i in range(0, len(contourPoints)):
+                point = contourPoints[i]
+                prevPoint = contourPoints[i - 1]
+                self.canvas.create_line(point[0], point[1],
+                                        prevPoint[0], prevPoint[1])
+
         self.root.after(400, self._updateLogStates)
 
     def _addLogStateLabel(self, name):
