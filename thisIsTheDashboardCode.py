@@ -15,7 +15,8 @@ TEST_MODE = False
 class RobotConnection:
 
     def __init__(self):
-        NetworkTables.initialize(server="roborio-2605-frc")
+        NetworkTables.initialize(server="roborio-2605-frc.local")
+        self.contoursTable = NetworkTables.getTable('contours')
         self.table = NetworkTables.getTable('dashboard')
 
     def isConnected(self):
