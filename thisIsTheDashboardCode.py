@@ -367,5 +367,6 @@ if __name__ == "__main__":
     if file == None:
         exit()
     switches = readSwitchConfig(file)
+    file.close()
     app = ThisIsTheDashboardApp(root, switches = switches)
     root.mainloop()
