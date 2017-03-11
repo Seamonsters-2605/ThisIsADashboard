@@ -300,6 +300,8 @@ class ThisIsTheDashboardApp:
 
         # update contours
         self.canvas.delete("all")
+        self.canvas.create_line(320, 200, 320, 280)
+        self.canvas.create_line(280, 240, 360, 240)
         contours = self.robotConnection.getContours()
         for contourPoints in contours:
             if len(contourPoints) < 2:
