@@ -310,7 +310,7 @@ class ThisIsTheDashboardApp:
                 self.canvas.create_line(point[0], point[1],
                                         prevPoint[0], prevPoint[1])
 
-        self.root.after(400, self._updateLogStates)
+        self.root.after(100, self._updateLogStates)
 
     def _addLogStateLabel(self, name):
         color = _getLogStateColor(name)
