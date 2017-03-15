@@ -121,7 +121,8 @@ class ThisIsTheDashboardApp:
 
     LOG_STATE_FONT = ("Helvetica", 24)
     IMPORTANT_LOG_STATE_FONT = ("Helvetica", 24, "bold underline")
-    CONNECT_BUTTON_FONT = ("Helvetica", 16)
+    CONNECT_BUTTON_FONT = ("Helvetica", 14)
+    SWITCH_FONT = ("Helvetica", 14)
 
     def __init__(self, root, switches):
         self.robotConnection = None
@@ -150,24 +151,27 @@ class ThisIsTheDashboardApp:
             checkbuttonFrame.pack(side=TOP, fill=X)
             
             checkbutton = Checkbutton(checkbuttonFrame, text=switch,
-                                      font=("Helvetica", 16),
+                                      font=ThisIsTheDashboardApp.SWITCH_FONT,
                                       variable=var,
                                       command=self._sendSwitchData)
             if enabled:
                 checkbutton.select()
             checkbutton.pack(side=LEFT)
 
-        self.connectButton = Button(leftFrame, height=2, text="Connect",
+        connectFrame = Frame(leftFrame)
+        connectFrame.pack(side=TOP, fill=X)
+
+        self.connectButton = Button(connectFrame, height=1, text="Connect",
                                font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
                                command = self._connectButtonPressed,
                                bg=ThisIsTheDashboardApp.DISCONNECTED_COLOR)
-        self.connectButton.pack(side=TOP, fill=X)
-        self.disconnectButton = Button(leftFrame, height=2, text="Disconnect",
+        self.connectButton.pack(side=LEFT, fill=X, expand=True)
+        self.disconnectButton = Button(connectFrame, height=1, text="Disconnect",
             font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT, state=DISABLED,
             command = self._disconnectButtonPressed)
-        self.disconnectButton.pack(side=TOP, fill=X)
+        self.disconnectButton.pack(side=LEFT, fill=X, expand=True)
 
-        self.shutdown = Button(leftFrame, height=2, text="Shut Down Pi",
+        self.shutdown = Button(leftFrame, height=1, text="Shut Down Pi",
                                 font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
                                 command = self.shutdownButtonPressed)
         self.shutdown.pack(side=TOP, fill= X)
