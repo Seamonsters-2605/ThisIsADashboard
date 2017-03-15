@@ -175,8 +175,6 @@ class ThisIsTheDashboardApp:
                                 font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
                                 command = self.shutdownButtonPressed)
         self.shutdown.pack(side=TOP, fill= X)
-        separator = Frame(frame, width=12)
-        separator.pack(side=LEFT)
 
         self.logFrame = Frame(frame, borderwidth=3, relief=SUNKEN)
         self.logFrame.pack(side=LEFT, fill=X, expand=True)
