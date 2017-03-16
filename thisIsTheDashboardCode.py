@@ -203,7 +203,7 @@ class ThisIsTheDashboardApp:
 
     def shutdownButtonPressed(self):
         try:
-            subprocess.run("plink.exe -ssh pi@raspberrypi -pw sehome \"sudo shutdown -h now\"",
+            subprocess.run("plink.exe -ssh pi@pi2605 -pw sehome \"sudo shutdown -h now\"",
                            check=True, stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as e:
             error = e.stderr
