@@ -129,7 +129,7 @@ class ThisIsTheDashboardApp:
         self._buildUI(root, switches)
     def _buildUI(self, root, switches):
         self.root = root
-        root.title("Seamonsters Dashboard!")
+        root.title("Seamonsters Dashboard! (1187)")
         
         frame = Frame(root)
         frame.pack(fill=BOTH, expand=True)
@@ -203,7 +203,7 @@ class ThisIsTheDashboardApp:
 
     def shutdownButtonPressed(self):
         try:
-            subprocess.run("plink.exe -ssh pi@pi2605 -pw sehome \"sudo shutdown -h now\"",
+            subprocess.run("plink.exe -ssh pi@pi2605.local -pw sehome \"sudo shutdown -h now\"",
                            check=True, stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as e:
             error = e.stderr
