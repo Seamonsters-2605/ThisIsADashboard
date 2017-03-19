@@ -129,7 +129,7 @@ class ThisIsTheDashboardApp:
         self._buildUI(root, switches)
     def _buildUI(self, root, switches):
         self.root = root
-        root.title("Seamonsters Dashboard! (1187)")
+        root.title("Seamonsters Dashboard! (1187/1188)")
         
         frame = Frame(root)
         frame.pack(fill=BOTH, expand=True)
