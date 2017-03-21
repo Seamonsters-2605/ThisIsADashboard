@@ -3,9 +3,11 @@ __author__ = "jacobvanthoog"
 from tkinter import *
 import hashlib
 from tkinter import filedialog
+from tkinter import messagebox
 import colorsys
 from networktables import NetworkTables
-import os
+import subprocess
+
 
 
 TEST_MODE = False
@@ -13,7 +15,8 @@ TEST_MODE = False
 class RobotConnection:
 
     def __init__(self):
-        NetworkTables.initialize(server="roborio-2605-frc")
+        NetworkTables.initialize(server="roborio-2605-frc.local")
+        self.contoursTable = NetworkTables.getTable('contours')
         self.table = NetworkTables.getTable('dashboard')
 
     def isConnected(self):
@@ -32,6 +35,46 @@ class RobotConnection:
             return logStates
         except BaseException:
             return { }
+
+    def getContours(self):
+        """
+        A coordinate is a tuple of 2 values. A contour is a list of coordinates.
+        This function returns a list of contours - so a list of lists of tuples.
+        """
+        try:
+            return self._readContours(self.contoursTable.getNumberArray('x'),
+                                       self.contoursTable.getNumberArray('y'))
+        except BaseException:
+            print("Vision connection error!")
+            return [ ]
+
+    def _readContours(self, xCoords, yCoords):
+        # check data
+        if len(xCoords) != len(yCoords):
+            print("ERROR: Incorrect contour data! "
+                  "len(xCoords) != len(yCoords)")
+            return []
+        numContours = xCoords.count(-1)
+        if numContours != yCoords.count(-1):
+            print("ERROR: Incorrect contour data! "
+                  "xCoords.count(-1) != yCoords.count(-1)")
+            return []
+
+        contours = []
+        currentContour = []
+        for i in range(0, len(xCoords)):
+            x = xCoords[i]
+            y = yCoords[i]
+            if x == -1:
+                if len(currentContour) != 0:
+                    contours.append(currentContour)
+                currentContour = []
+            else:
+                currentContour.append((x, y))
+        if len(currentContour) != 0:
+            contours.append(currentContour)
+
+        return contours
 
     def sendSwitchData(self, switches):
         print(switches)
@@ -61,6 +104,10 @@ class TestRobotConnection:
                 'This is a long key name': "This is a long value",
                 'Key': "This value is important!"}
 
+    def getContours(self):
+        return [ [(30, 100), (30, 200), (70, 200)],
+                 [(150, 100), (150, 200), (190, 200)] ]
+
     def sendSwitchData(self, switches):
         print(switches)
 
@@ -74,14 +121,15 @@ class ThisIsTheDashboardApp:
 
     LOG_STATE_FONT = ("Helvetica", 24)
     IMPORTANT_LOG_STATE_FONT = ("Helvetica", 24, "bold underline")
-    CONNECT_BUTTON_FONT = ("Helvetica", 16)
+    CONNECT_BUTTON_FONT = ("Helvetica", 14)
+    SWITCH_FONT = ("Helvetica", 14)
 
     def __init__(self, root, switches):
         self.robotConnection = None
         self._buildUI(root, switches)
     def _buildUI(self, root, switches):
         self.root = root
-        root.title("Seamonsters Dashboard!")
+        root.title("Seamonsters Dashboard! (1187/1188)")
         
         frame = Frame(root)
         frame.pack(fill=BOTH, expand=True)
@@ -103,34 +151,40 @@ class ThisIsTheDashboardApp:
             checkbuttonFrame.pack(side=TOP, fill=X)
             
             checkbutton = Checkbutton(checkbuttonFrame, text=switch,
-                                      font=("Helvetica", 16),
+                                      font=ThisIsTheDashboardApp.SWITCH_FONT,
                                       variable=var,
                                       command=self._sendSwitchData)
             if enabled:
                 checkbutton.select()
             checkbutton.pack(side=LEFT)
 
-        self.connectButton = Button(leftFrame, height=2, text="Connect",
+        connectFrame = Frame(leftFrame)
+        connectFrame.pack(side=TOP, fill=X)
+
+        self.connectButton = Button(connectFrame, height=1, text="Connect",
                                font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
                                command = self._connectButtonPressed,
                                bg=ThisIsTheDashboardApp.DISCONNECTED_COLOR)
-        self.connectButton.pack(side=TOP, fill=X)
-        self.disconnectButton = Button(leftFrame, height=2, text="Disconnect",
+        self.connectButton.pack(side=LEFT, fill=X, expand=True)
+        self.disconnectButton = Button(connectFrame, height=1, text="Disconnect",
             font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT, state=DISABLED,
             command = self._disconnectButtonPressed)
-        self.disconnectButton.pack(side=TOP, fill=X)
+        self.disconnectButton.pack(side=LEFT, fill=X, expand=True)
 
-        self.shutdown = Button(leftFrame, height=2, text="Shut Down Pi",
+        self.shutdown = Button(leftFrame, height=1, text="Shut Down Pi",
                                 font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
                                 command = self.shutdownButtonPressed)
         self.shutdown.pack(side=TOP, fill= X)
-        separator = Frame(frame, width=12)
-        separator.pack(side=LEFT)
 
         self.logFrame = Frame(frame, borderwidth=3, relief=SUNKEN)
         self.logFrame.pack(side=LEFT, fill=X, expand=True)
         
         self.logStateLabels = { }
+
+
+        self.canvas = Canvas(frame, width=640, height=480)
+        self.canvas.pack()
+
 
     def _connectButtonPressed(self):
         global TEST_MODE
@@ -148,7 +202,24 @@ class ThisIsTheDashboardApp:
             self._disconnectedError()
 
     def shutdownButtonPressed(self):
-        os.system("plink.exe -ssh pi@raspberrypi -pw sehome \"sudo shutdown -h now\"")
+        try:
+            subprocess.run("plink.exe -ssh pi@pi2605.local -pw sehome \"sudo shutdown -h now\"",
+                           check=True, stderr=subprocess.PIPE)
+        except subprocess.CalledProcessError as e:
+            error = e.stderr
+            if error == None:
+                error = ""
+            else:
+                error = error.decode("utf-8")
+            messagebox.showerror(
+                "Error while shutting down",
+                error
+            )
+        except BaseException as e:
+            messagebox.showerror(
+                "Unrecognized error while shutting down",
+                str(e)
+            )
 
     def _waitForConnection(self):
         if self.waitCount > 10:
@@ -228,7 +299,22 @@ class ThisIsTheDashboardApp:
                     font=ThisIsTheDashboardApp.IMPORTANT_LOG_STATE_FONT)
             else:
                 label.config(font=ThisIsTheDashboardApp.LOG_STATE_FONT)
-        self.root.after(400, self._updateLogStates)
+
+        # update contours
+        self.canvas.delete("all")
+        self.canvas.create_line(320, 200, 320, 280)
+        self.canvas.create_line(280, 240, 360, 240)
+        contours = self.robotConnection.getContours()
+        for contourPoints in contours:
+            if len(contourPoints) < 2:
+                continue
+            for i in range(0, len(contourPoints)):
+                point = contourPoints[i]
+                prevPoint = contourPoints[i - 1]
+                self.canvas.create_line(point[0], point[1],
+                                        prevPoint[0], prevPoint[1])
+
+        self.root.after(100, self._updateLogStates)
 
     def _addLogStateLabel(self, name):
         color = _getLogStateColor(name)
@@ -285,5 +371,6 @@ if __name__ == "__main__":
     if file == None:
         exit()
     switches = readSwitchConfig(file)
+    file.close()
     app = ThisIsTheDashboardApp(root, switches = switches)
     root.mainloop()
