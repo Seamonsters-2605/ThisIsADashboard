@@ -1,6 +1,19 @@
 __author__ = "seamonsters"
 from tkinter import *
+from pywinauto import Application
+app = Application()
+
+#app.Connect(path = r"C:\Program Files\Mozilla Firefox\firefox.exe")
+app.Start(r"C:\Program Files\Mozilla Firefox\firefox.exe http://10.26.5.2:1187")
+
+win = app.window()
+
+wrap = win.WrapperObject()
+
+wrap.MoveWindow(x = 0, y = 0, width = 532, height = 500)
+
 master = Tk()
+master.geometry("+0+0")
 w = Canvas(master, width=510, height=500)
 w.pack()
 
