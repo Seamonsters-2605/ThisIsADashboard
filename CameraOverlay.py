@@ -1,10 +1,10 @@
 __author__ = "seamonsters"
 from tkinter import *
-import tkinter as tk
 master = Tk()
 w = Canvas(master, width=510, height=500)
 w.pack()
 
+master.attributes("-alpha", 0.25)
 
 master.resizable(width=False, height=False)
 
