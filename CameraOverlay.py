@@ -5,17 +5,17 @@ app = Application()
 
 #app.Connect(path = r"C:\Program Files\Mozilla Firefox\firefox.exe")
 app.Start(r"C:\Program Files\Mozilla Firefox\firefox.exe http://10.26.5.2:1187")
-
+#kaz is lame from Jae-chan
 win = app.window()
 
 wrap = win.WrapperObject()
 
-wrap.MoveWindow(x = 1390, y = 0, width = 532, height = 600)
+wrap.MoveWindow(x = 1265, y = 0, width = 660, height = 630)
 
 master = Tk()
 master.title("Overlay")
-master.geometry("+1390+60")
-w = Canvas(master, width=510, height=500)
+master.geometry("+1265+0")
+w = Canvas(master, width=650, height=580)
 w.pack()
 
 master.attributes("-alpha", 0.25)
