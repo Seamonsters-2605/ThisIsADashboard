@@ -7,7 +7,7 @@ from tkinter import messagebox
 import colorsys
 from networktables import NetworkTables
 import subprocess
-
+import random
 
 
 TEST_MODE = False
@@ -18,6 +18,7 @@ class RobotConnection:
         NetworkTables.initialize(server="roborio-2605-frc.local")
         self.contoursTable = NetworkTables.getTable('contours')
         self.table = NetworkTables.getTable('dashboard')
+        self.commandTable = NetworkTables.getTable('commands')
 
     def isConnected(self):
         return NetworkTables.isConnected()
@@ -83,6 +84,16 @@ class RobotConnection:
         self.table.putStringArray('switchnames', switchNames)
         self.table.putBooleanArray('switchvalues', switchValues)
 
+    def sendCommand(self, command):
+        lastId = self.commandTable.getNumber('id')
+        newId = lastId
+        while newId == lastId:
+            newId = random.randrange(1, 65536)
+        print(lastId, newId)
+        self.commandTable.putString('command', command)
+        self.commandTable.putNumber('id', newId)
+        print(self.commandTable.getString('command'))
+
 
 class TestRobotConnection:
 
@@ -110,6 +121,9 @@ class TestRobotConnection:
 
     def sendSwitchData(self, switches):
         print(switches)
+
+    def sendCommand(self, command):
+        print("Command:", command)
 
 
 class ThisIsTheDashboardApp:
@@ -170,6 +184,15 @@ class ThisIsTheDashboardApp:
             font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT, state=DISABLED,
             command = self._disconnectButtonPressed)
         self.disconnectButton.pack(side=LEFT, fill=X, expand=True)
+
+        self.commandEntry = Entry(leftFrame)
+        self.commandEntry.pack(side=TOP, fill=X, expand=True)
+
+        self.commandButton = Button(leftFrame, height=1, text="Run command",
+            font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
+            command=self._commandButtonPressed,
+            state=DISABLED)
+        self.commandButton.pack(side=TOP, fill=X, expand=True)
 
         self.shutdown = Button(leftFrame, height=1, text="Shut Down Pi",
                                 font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
@@ -253,23 +276,27 @@ class ThisIsTheDashboardApp:
         self.connectButton.config(bg=ThisIsTheDashboardApp.CONNECTED_COLOR,
                                   state=DISABLED)
         self.disconnectButton.config(state=NORMAL)
+        self.commandButton.config(state=NORMAL)
 
     def _waiting(self):
         self.connectButton.config(bg=ThisIsTheDashboardApp.WAIT_COLOR,
                                   state=DISABLED)
         self.disconnectButton.config(state=DISABLED)
+        self.commandButton.config(state=DISABLED)
 
     def _disconnectedSuccess(self):
         self.robotConnection = None
         self.connectButton.config(bg=ThisIsTheDashboardApp.DISCONNECTED_COLOR,
                                   state=NORMAL)
         self.disconnectButton.config(state=DISABLED)
+        self.commandButton.config(state=DISABLED)
 
     def _disconnectedError(self):
         self.robotConnection = None
         self.connectButton.config(bg=ThisIsTheDashboardApp.ERROR_COLOR,
                                   state=NORMAL)
         self.disconnectButton.config(state=DISABLED)
+        self.commandButton.config(state=DISABLED)
         for i in range(0, 3):
             self.connectButton.flash()
 
@@ -331,6 +358,9 @@ class ThisIsTheDashboardApp:
         valueLabel.pack(side=LEFT)
 
         self.logStateLabels[name] = valueLabel
+
+    def _commandButtonPressed(self):
+        self.robotConnection.sendCommand(self.commandEntry.get())
 
 def _getLogStateColor(title):
     titleHash = hashlib.sha256()
