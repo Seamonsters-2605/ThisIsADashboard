@@ -10,10 +10,11 @@ win = app.window()
 
 wrap = win.WrapperObject()
 
-wrap.MoveWindow(x = 0, y = 0, width = 532, height = 500)
+wrap.MoveWindow(x = 1390, y = 0, width = 532, height = 600)
 
 master = Tk()
-master.geometry("+0+0")
+master.title("Overlay")
+master.geometry("+1390+60")
 w = Canvas(master, width=510, height=500)
 w.pack()
 
