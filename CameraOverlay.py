@@ -1,6 +1,20 @@
 __author__ = "seamonsters"
 from tkinter import *
 from pywinauto import Application
+
+def moveWindows():
+    global wrap, master
+    wrap.MoveWindow(x=1265, y=0, width=660, height=630)
+    master.geometry("+1265+0")
+
+def lowerWindow():
+    global master
+    master.lower()
+
+def raiseWindow():
+    global master
+    master.lift()
+
 app = Application()
 
 #app.Connect(path = r"C:\Program Files\Mozilla Firefox\firefox.exe")
@@ -9,13 +23,29 @@ win = app.window()
 
 wrap = win.WrapperObject()
 
-wrap.MoveWindow(x = 1265, y = 0, width = 660, height = 630)
 
 master = Tk()
 master.title("Overlay")
-master.geometry("+1265+0")
+
+moveWindows()
+
 w = Canvas(master, width=650, height=580)
-w.pack()
+w.pack(side=TOP)
+
+buttonFrame = Frame(master)
+buttonFrame.pack(side=TOP, fill=X, expand=True)
+
+expandFrame = Frame(buttonFrame)
+expandFrame.pack(side=LEFT, fill=X, expand=True)
+
+resetButton = Button(buttonFrame, text="RESET WINDOWS", command=moveWindows, height=2)
+resetButton.pack(side=LEFT)
+
+lowerButton = Button(buttonFrame, text="v v  LOWER OVERLAY  v v", command=lowerWindow, height=2)
+lowerButton.pack(side=LEFT)
+
+raiseButton = Button(buttonFrame, text="^^ RAISE OVERLAY ^^", command=raiseWindow, height=2)
+raiseButton.pack(side=LEFT)
 
 master.attributes("-alpha", 0.35)
 
