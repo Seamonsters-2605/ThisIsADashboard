@@ -135,8 +135,8 @@ class ThisIsTheDashboardApp:
 
     LOG_STATE_FONT = ("Helvetica", 24)
     IMPORTANT_LOG_STATE_FONT = ("Helvetica", 24, "bold underline")
-    CONNECT_BUTTON_FONT = ("Helvetica", 14)
-    SWITCH_FONT = ("Helvetica", 14)
+    CONNECT_BUTTON_FONT = ("Helvetica", 12)
+    SWITCH_FONT = ("Helvetica", 12)
 
     def __init__(self, root, switches):
         self.robotConnection = None
@@ -187,6 +187,7 @@ class ThisIsTheDashboardApp:
 
         self.commandEntry = Entry(leftFrame)
         self.commandEntry.pack(side=TOP, fill=X, expand=True)
+        self.commandEntry.focus()
 
         self.commandButton = Button(leftFrame, height=1, text="Run command",
             font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
@@ -211,6 +212,9 @@ class ThisIsTheDashboardApp:
 
     def _connectButtonPressed(self):
         global TEST_MODE
+
+        messagebox.showerror("Warning!!", "Make sure battery is strapped in!")
+
         try:
             if TEST_MODE:
                 self.robotConnection = TestRobotConnection()
@@ -402,5 +406,7 @@ if __name__ == "__main__":
         exit()
     switches = readSwitchConfig(file)
     file.close()
+
+    root.geometry("+112+0")
     app = ThisIsTheDashboardApp(root, switches = switches)
     root.mainloop()
