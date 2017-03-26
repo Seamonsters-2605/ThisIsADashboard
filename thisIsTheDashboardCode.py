@@ -110,14 +110,23 @@ class TestRobotConnection:
 
     def getLogStates(self):
         self.testNumber += 1
-        return {'Test number': str(self.testNumber),
-                'abc': "123",
-                'This is a long key name': "This is a long value",
-                'Key': "This value is important!"}
+        return {'': "Dashboard in Demo Mode!",
+                'Drive mode': "Position",
+                'Field oriented': "Disabled",
+                'Drive current': "0.625",
+                'Gear': "No gear",
+                'Climber lock mode': "On!",
+                'Climber status': "Locked!",
+                'Flywheel speed': "0",
+                'Flywheel mode': "Speed",
+                'Rotation offset': "-0.02304",
+                'Strafe alignment': "0.08555"
+                #,'Test number': str(self.testNumber),
+                }
 
     def getContours(self):
-        return [ [(30, 100), (30, 200), (70, 200)],
-                 [(150, 100), (150, 200), (190, 200)] ]
+        return [ [(30, 100), (30, 200), (70, 200), (70, 100)],
+                 [(150, 100), (150, 200), (190, 200), (190, 100)] ]
 
     def sendSwitchData(self, switches):
         print(switches)
