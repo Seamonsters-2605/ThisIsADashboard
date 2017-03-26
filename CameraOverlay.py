@@ -4,7 +4,7 @@ from pywinauto import Application
 app = Application()
 
 #app.Connect(path = r"C:\Program Files\Mozilla Firefox\firefox.exe")
-app.Start(r"C:\Program Files\Mozilla Firefox\firefox.exe http://10.26.5.2:1187")
+app.Start(r"C:\Program Files\Mozilla Firefox\firefox.exe file:///C:/Users/seamonsters/Documents/CompetitionBot2017/camerapage.html")
 win = app.window()
 
 wrap = win.WrapperObject()
@@ -17,22 +17,17 @@ master.geometry("+1265+0")
 w = Canvas(master, width=650, height=580)
 w.pack()
 
-master.attributes("-alpha", 0.25)
+master.attributes("-alpha", 0.35)
 
 master.resizable(width=False, height=False)
 
 x=0
-y=0
-Color = "deep pink"
-Width = 6
-#w.create_line(240+x,150+y,240+x,150+y,width=Width,fill=Color)
-#w.create_line(240+x,105+y,225+x,85+y,width=Width,fill=Color)
-#w.create_line(240+x,142+y,290+x,132+y,width=Width,fill=Color)
-#w.create_line(290+x,132+y,287+x,103+y,width=Width,fill=Color)
-#w.create_line(287+x,103+y,300+x,80+y,width=Width,fill=Color)
-#w.create_line(232+x,360+y,232+x,266+y,width=Width,fill=Color)
-#w.create_line(174+x,313+y,290+x,313+y,width=Width,fill=Color)
-w.create_line(250+x,195+y,400+x,195+y,width=Width,fill=Color)
-w.create_line(250+x,237+y,400+x,237+y,width=Width,fill=Color)
-w.create_line(325+x,195+y,325+x,237+y,width=Width,fill=Color)
+y=1
+Color = "green"
+Width = 3
+
+w.create_line(224+x,190+y,424+x,190+y,width=Width,fill=Color)
+w.create_line(224+x,250+y,424+x,250+y,width=Width,fill=Color)
+w.create_line(324+x,150+y,324+x,290+y,width=Width,fill=Color)
+#w.create_line(265+x,200+y,330+x,340+y,width=Width,fill=Color)
 mainloop()
