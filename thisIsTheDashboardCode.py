@@ -137,10 +137,10 @@ class TestRobotConnection:
 
 class ThisIsTheDashboardApp:
 
-    DISCONNECTED_COLOR = "#AAAAAA"
+    DISCONNECTED_COLOR = "#CCCCCC"
     CONNECTED_COLOR = "#55FF55"
-    ERROR_COLOR = "#FF0000"
-    WAIT_COLOR = "#FFFF00"
+    ERROR_COLOR = "#FF7777"
+    WAIT_COLOR = "#FFFF77"
 
     LOG_STATE_FONT = ("Helvetica", 24)
     IMPORTANT_LOG_STATE_FONT = ("Helvetica", 24, "bold underline")
@@ -160,7 +160,7 @@ class ThisIsTheDashboardApp:
         leftFrame = Frame(frame)
         leftFrame.pack(side=LEFT)
 
-        switchFrame = Frame(leftFrame, borderwidth=3, relief=SUNKEN,
+        switchFrame = Frame(leftFrame, borderwidth=3, relief=GROOVE,
                             padx=5, pady=5)
         switchFrame.pack(side=TOP, fill=X)
 
@@ -209,7 +209,10 @@ class ThisIsTheDashboardApp:
                                 command = self.shutdownButtonPressed)
         self.shutdown.pack(side=TOP, fill= X)
 
-        self.logFrame = Frame(frame, borderwidth=3, relief=SUNKEN)
+        padFrame = Frame(frame, width=8)
+        padFrame.pack(side=LEFT)
+
+        self.logFrame = Frame(frame)
         self.logFrame.pack(side=LEFT, fill=X, expand=True)
         
         self.logStateLabels = { }
