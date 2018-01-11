@@ -1,4 +1,4 @@
-__author__ = "jacobvanthoog"
+__author__ = "seamonsters"
 
 from tkinter import *
 import hashlib
@@ -6,7 +6,6 @@ from tkinter import filedialog
 from tkinter import messagebox
 import colorsys
 from networktables import NetworkTables
-import subprocess
 import random
 
 
@@ -15,8 +14,7 @@ TEST_MODE = False
 class RobotConnection:
 
     def __init__(self):
-        NetworkTables.initialize(server="roborio-2605-frc.local")
-        self.contoursTable = NetworkTables.getTable('contours')
+        NetworkTables.initialize(server="10.26.5.2")
         self.table = NetworkTables.getTable('dashboard')
         self.commandTable = NetworkTables.getTable('commands')
 
@@ -36,46 +34,6 @@ class RobotConnection:
             return logStates
         except BaseException:
             return { }
-
-    def getContours(self):
-        """
-        A coordinate is a tuple of 2 values. A contour is a list of coordinates.
-        This function returns a list of contours - so a list of lists of tuples.
-        """
-        try:
-            return self._readContours(self.contoursTable.getNumberArray('x'),
-                                       self.contoursTable.getNumberArray('y'))
-        except BaseException:
-            print("Vision connection error!")
-            return [ ]
-
-    def _readContours(self, xCoords, yCoords):
-        # check data
-        if len(xCoords) != len(yCoords):
-            print("ERROR: Incorrect contour data! "
-                  "len(xCoords) != len(yCoords)")
-            return []
-        numContours = xCoords.count(-1)
-        if numContours != yCoords.count(-1):
-            print("ERROR: Incorrect contour data! "
-                  "xCoords.count(-1) != yCoords.count(-1)")
-            return []
-
-        contours = []
-        currentContour = []
-        for i in range(0, len(xCoords)):
-            x = xCoords[i]
-            y = yCoords[i]
-            if x == -1:
-                if len(currentContour) != 0:
-                    contours.append(currentContour)
-                currentContour = []
-            else:
-                currentContour.append((x, y))
-        if len(currentContour) != 0:
-            contours.append(currentContour)
-
-        return contours
 
     def sendSwitchData(self, switches):
         print(switches)
@@ -124,10 +82,6 @@ class TestRobotConnection:
                 #,'Test number': str(self.testNumber),
                 }
 
-    def getContours(self):
-        return [ [(30, 100), (30, 200), (70, 200), (70, 100)],
-                 [(150, 100), (150, 200), (190, 200), (190, 100)] ]
-
     def sendSwitchData(self, switches):
         print(switches)
 
@@ -150,6 +104,7 @@ class ThisIsTheDashboardApp:
     def __init__(self, root, switches):
         self.robotConnection = None
         self._buildUI(root, switches)
+
     def _buildUI(self, root, switches):
         self.root = root
         root.title("Seamonsters Dashboard! (1187/1188)")
@@ -204,10 +159,10 @@ class ThisIsTheDashboardApp:
             state=DISABLED)
         self.commandButton.pack(side=TOP, fill=X, expand=True)
 
-        self.shutdown = Button(leftFrame, height=1, text="Shut Down Pi",
-                                font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
-                                command = self.shutdownButtonPressed)
-        self.shutdown.pack(side=TOP, fill= X)
+        resetButton = Button(leftFrame, height=1, text="Reset",
+            font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
+            command=self._resetButtonPressed)
+        resetButton.pack(side=TOP, fill=X, expand=True)
 
         padFrame = Frame(frame, width=8)
         padFrame.pack(side=LEFT)
@@ -216,10 +171,6 @@ class ThisIsTheDashboardApp:
         self.logFrame.pack(side=LEFT, fill=X, expand=True)
         
         self.logStateLabels = { }
-
-
-        self.canvas = Canvas(frame, width=640, height=480)
-        self.canvas.pack()
 
 
     def _connectButtonPressed(self):
@@ -239,26 +190,6 @@ class ThisIsTheDashboardApp:
             print("Exception:", e)
             self.robotConnection.disconnect()
             self._disconnectedError()
-
-    def shutdownButtonPressed(self):
-        try:
-            subprocess.run("plink.exe -ssh pi@pi2605.local -pw sehome \"sudo shutdown -h now\"",
-                           check=True, stderr=subprocess.PIPE)
-        except subprocess.CalledProcessError as e:
-            error = e.stderr
-            if error == None:
-                error = ""
-            else:
-                error = error.decode("utf-8")
-            messagebox.showerror(
-                "Error while shutting down",
-                error
-            )
-        except BaseException as e:
-            messagebox.showerror(
-                "Unrecognized error while shutting down",
-                str(e)
-            )
 
     def _waitForConnection(self):
         if self.waitCount > 10:
@@ -287,6 +218,11 @@ class ThisIsTheDashboardApp:
             return
         self.robotConnection.disconnect()
         self._disconnectedSuccess()
+
+    def _resetButtonPressed(self):
+        self.logStateLabels = { }
+        for child in self.logFrame.winfo_children():
+            child.destroy()
 
     def _connected(self):
         self.connectButton.config(bg=ThisIsTheDashboardApp.CONNECTED_COLOR,
@@ -343,27 +279,13 @@ class ThisIsTheDashboardApp:
             else:
                 label.config(font=ThisIsTheDashboardApp.LOG_STATE_FONT)
 
-        # update contours
-        self.canvas.delete("all")
-        self.canvas.create_line(320, 200, 320, 280)
-        self.canvas.create_line(280, 240, 360, 240)
-        contours = self.robotConnection.getContours()
-        for contourPoints in contours:
-            if len(contourPoints) < 2:
-                continue
-            for i in range(0, len(contourPoints)):
-                point = contourPoints[i]
-                prevPoint = contourPoints[i - 1]
-                self.canvas.create_line(point[0], point[1],
-                                        prevPoint[0], prevPoint[1])
-
         self.root.after(100, self._updateLogStates)
 
     def _addLogStateLabel(self, name):
         color = _getLogStateColor(name)
         
         stateFrame = Frame(self.logFrame, bg=color,
-                           borderwidth=3, relief=GROOVE)
+                           borderwidth=3, relief=RAISED)
         stateFrame.pack(side=TOP, fill=X)
         
         titleLabel = Label(stateFrame, text=name + ":",
@@ -383,7 +305,7 @@ def _getLogStateColor(title):
     titleHash.update(title.encode('utf-8'))
     hashValue = titleHash.digest()
     hue = hashValue[0]
-    r,g,b = colorsys.hsv_to_rgb(float(hue)/256.0, 0.7, 1.0)
+    r,g,b = colorsys.hsv_to_rgb(float(hue)/256.0, 0.6, 1.0)
     colorHex = '#%02x%02x%02x' % (int(r*255), int(g*255), int(b*255))
     return colorHex
 
