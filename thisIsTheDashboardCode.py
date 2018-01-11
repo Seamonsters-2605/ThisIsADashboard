@@ -1,6 +1,7 @@
 __author__ = "seamonsters"
 
 from tkinter import *
+from tkinter import ttk
 import hashlib
 from tkinter import filedialog
 from tkinter import messagebox
@@ -91,32 +92,38 @@ class TestRobotConnection:
 
 class ThisIsTheDashboardApp:
 
-    DISCONNECTED_COLOR = "#CCCCCC"
-    CONNECTED_COLOR = "#55FF55"
-    ERROR_COLOR = "#FF7777"
-    WAIT_COLOR = "#FFFF77"
-
     LOG_STATE_FONT = ("Helvetica", 24)
     IMPORTANT_LOG_STATE_FONT = ("Helvetica", 24, "bold underline")
-    CONNECT_BUTTON_FONT = ("Helvetica", 12)
-    SWITCH_FONT = ("Helvetica", 12)
 
     def __init__(self, root, switches):
         self.robotConnection = None
+
+        style = ttk.Style()
+        style.configure('switch.TCheckbutton', font=('Helvetica', 12))
+        style.configure('dashboard.TButton', font=('Helvetica', 12))
+        style.configure('connected.TButton', font=('Helvetica', 12),
+                        background="#55FF55")
+        style.configure('disconnected.TButton', font=('Helvetica', 12),
+                        background="#CCCCCC")
+        style.configure('error.TButton', font=('Helvetica', 12),
+                        background="#FF7777")
+        style.configure('wait.TButton', font=('Helvetica', 12),
+                        background="#FFFF77")
+
         self._buildUI(root, switches)
 
     def _buildUI(self, root, switches):
         self.root = root
         root.title("Seamonsters Dashboard! (1187/1188)")
         
-        frame = Frame(root)
+        frame = ttk.Frame(root)
         frame.pack(fill=BOTH, expand=True)
 
-        leftFrame = Frame(frame)
+        leftFrame = ttk.Frame(frame)
         leftFrame.pack(side=LEFT)
 
-        switchFrame = Frame(leftFrame, borderwidth=3, relief=GROOVE,
-                            padx=5, pady=5)
+        switchFrame = ttk.Frame(leftFrame, borderwidth=3, relief=GROOVE,
+                                padding=8)
         switchFrame.pack(side=TOP, fill=X)
 
         self.switchVars = { }
@@ -125,49 +132,44 @@ class ThisIsTheDashboardApp:
             var = IntVar()
             self.switchVars[switch] = var
 
-            checkbuttonFrame = Frame(switchFrame)
+            checkbuttonFrame = ttk.Frame(switchFrame)
             checkbuttonFrame.pack(side=TOP, fill=X)
             
-            checkbutton = Checkbutton(checkbuttonFrame, text=switch,
-                                      font=ThisIsTheDashboardApp.SWITCH_FONT,
-                                      variable=var,
-                                      command=self._sendSwitchData)
+            checkbutton = ttk.Checkbutton(checkbuttonFrame, text=switch,
+                variable=var, command=self._sendSwitchData,
+                style='switch.TCheckbutton')
             if enabled:
-                checkbutton.select()
+                var.set(1)
             checkbutton.pack(side=LEFT)
 
-        connectFrame = Frame(leftFrame)
+        connectFrame = ttk.Frame(leftFrame)
         connectFrame.pack(side=TOP, fill=X)
 
-        self.connectButton = Button(connectFrame, height=1, text="Connect",
-                               font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
-                               command = self._connectButtonPressed,
-                               bg=ThisIsTheDashboardApp.DISCONNECTED_COLOR)
+        self.connectButton = ttk.Button(connectFrame, text="Connect",
+            style='disconnected.TButton', command=self._connectButtonPressed)
         self.connectButton.pack(side=LEFT, fill=X, expand=True)
-        self.disconnectButton = Button(connectFrame, height=1, text="Disconnect",
-            font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT, state=DISABLED,
+        self.disconnectButton = ttk.Button(connectFrame, text="Disconnect",
+            style='dashboard.TButton', state=DISABLED,
             command = self._disconnectButtonPressed)
         self.disconnectButton.pack(side=LEFT, fill=X, expand=True)
 
-        self.commandEntry = Entry(leftFrame)
+        self.commandEntry = ttk.Entry(leftFrame)
         self.commandEntry.pack(side=TOP, fill=X, expand=True)
         self.commandEntry.focus()
 
-        self.commandButton = Button(leftFrame, height=1, text="Run command",
-            font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
-            command=self._commandButtonPressed,
+        self.commandButton = ttk.Button(leftFrame, text="Run command",
+            style='dashboard.TButton', command=self._commandButtonPressed,
             state=DISABLED)
         self.commandButton.pack(side=TOP, fill=X, expand=True)
 
-        resetButton = Button(leftFrame, height=1, text="Reset",
-            font=ThisIsTheDashboardApp.CONNECT_BUTTON_FONT,
-            command=self._resetButtonPressed)
+        resetButton = ttk.Button(leftFrame, text="Reset",
+            style='dashboard.TButton', command=self._resetButtonPressed)
         resetButton.pack(side=TOP, fill=X, expand=True)
 
-        padFrame = Frame(frame, width=8)
+        padFrame = ttk.Frame(frame, width=8)
         padFrame.pack(side=LEFT)
 
-        self.logFrame = Frame(frame)
+        self.logFrame = ttk.Frame(frame)
         self.logFrame.pack(side=LEFT, fill=X, expand=True)
         
         self.logStateLabels = { }
@@ -225,32 +227,26 @@ class ThisIsTheDashboardApp:
             child.destroy()
 
     def _connected(self):
-        self.connectButton.config(bg=ThisIsTheDashboardApp.CONNECTED_COLOR,
-                                  state=DISABLED)
+        self.connectButton.config(style='connected.TButton', state=DISABLED)
         self.disconnectButton.config(state=NORMAL)
         self.commandButton.config(state=NORMAL)
 
     def _waiting(self):
-        self.connectButton.config(bg=ThisIsTheDashboardApp.WAIT_COLOR,
-                                  state=DISABLED)
+        self.connectButton.config(style='wait.TButton', state=DISABLED)
         self.disconnectButton.config(state=DISABLED)
         self.commandButton.config(state=DISABLED)
 
     def _disconnectedSuccess(self):
         self.robotConnection = None
-        self.connectButton.config(bg=ThisIsTheDashboardApp.DISCONNECTED_COLOR,
-                                  state=NORMAL)
+        self.connectButton.config(style='disconnected.TButton', state=NORMAL)
         self.disconnectButton.config(state=DISABLED)
         self.commandButton.config(state=DISABLED)
 
     def _disconnectedError(self):
         self.robotConnection = None
-        self.connectButton.config(bg=ThisIsTheDashboardApp.ERROR_COLOR,
-                                  state=NORMAL)
+        self.connectButton.config(style='error.TButton', state=NORMAL)
         self.disconnectButton.config(state=DISABLED)
         self.commandButton.config(state=DISABLED)
-        for i in range(0, 3):
-            self.connectButton.flash()
 
     def _sendSwitchData(self):
         if self.robotConnection == None:
@@ -283,16 +279,18 @@ class ThisIsTheDashboardApp:
 
     def _addLogStateLabel(self, name):
         color = _getLogStateColor(name)
-        
+
         stateFrame = Frame(self.logFrame, bg=color,
                            borderwidth=3, relief=RAISED)
         stateFrame.pack(side=TOP, fill=X)
         
-        titleLabel = Label(stateFrame, text=name + ":",
-                           font=ThisIsTheDashboardApp.LOG_STATE_FONT, bg=color)
+        titleLabel = ttk.Label(stateFrame, text=name + ":",
+                               font=ThisIsTheDashboardApp.LOG_STATE_FONT,
+                               background=color)
         titleLabel.pack(side=LEFT)
-        valueLabel = Label(stateFrame, text="None",
-                           font=ThisIsTheDashboardApp.LOG_STATE_FONT, bg=color)
+        valueLabel = ttk.Label(stateFrame, text="None",
+                               font=ThisIsTheDashboardApp.LOG_STATE_FONT,
+                               background=color)
         valueLabel.pack(side=LEFT)
 
         self.logStateLabels[name] = valueLabel
