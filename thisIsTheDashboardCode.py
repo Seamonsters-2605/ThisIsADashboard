@@ -222,7 +222,7 @@ class ThisIsTheDashboardApp:
         self.disconnectButton.config(state=NORMAL)
         self.commandButton.config(state=NORMAL)
         self.progress.stop()
-        self.progressVar.set(maximum=ThisIsTheDashboardApp.PROGRESS_MAX)
+        self.progressVar.set(ThisIsTheDashboardApp.PROGRESS_MAX)
 
     def _waiting(self):
         self.connectButton.config(state=DISABLED)
