@@ -159,10 +159,7 @@ class ThisIsTheDashboardApp:
             style='dashboard.TButton', command=self._resetButtonPressed)
         resetButton.pack(side=TOP, fill=X)
 
-        padFrame = ttk.Frame(frame, width=8)
-        padFrame.pack(side=LEFT)
-
-        self.logFrame = ttk.Frame(frame)
+        self.logFrame = ttk.Frame(frame, padding=(50, 0, 0, 0))
         self.logFrame.pack(side=LEFT, fill=X, expand=True)
         
         self.logStateLabels = { }
