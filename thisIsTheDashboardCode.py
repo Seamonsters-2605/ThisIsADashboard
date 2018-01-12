@@ -123,7 +123,7 @@ class ThisIsTheDashboardApp:
         frame.pack(fill=BOTH, expand=True)
 
         leftFrame = ttk.Frame(frame)
-        leftFrame.pack(side=LEFT, fill=Y, expand=True)
+        leftFrame.pack(side=LEFT, fill=Y)
 
         self.logo = ttk.Label(leftFrame, text="2605",
                               style='disconnected.TLabel')
@@ -161,7 +161,7 @@ class ThisIsTheDashboardApp:
         resetButton.pack(side=TOP, fill=X)
 
         self.logFrame = ttk.Frame(frame, padding=(50, 0, 0, 0))
-        self.logFrame.pack(side=LEFT, fill=X, expand=True)
+        self.logFrame.pack(side=TOP, fill=X, expand=True, anchor=N)
         
         self.logStateLabels = { }
 
