@@ -8,14 +8,14 @@ from tkinter import messagebox
 import colorsys
 from networktables import NetworkTables
 import random
+import socket
 
-
-TEST_MODE = False
 
 class RobotConnection:
 
-    def __init__(self):
-        NetworkTables.initialize(server="10.26.5.2")
+    def __init__(self, ip):
+        print("Attempting to connect to", ip)
+        NetworkTables.initialize(server=ip)
         self.table = NetworkTables.getTable('dashboard')
         self.commandTable = NetworkTables.getTable('commands')
 
@@ -122,11 +122,18 @@ class ThisIsTheDashboardApp:
 
         ttk.Label(leftFrame, text="2605", style='logo.TLabel').pack(side=TOP)
 
-        self.switchFrame = ttk.Frame(leftFrame, borderwidth=3, relief=GROOVE,
-                                     padding=8)
-        self.switchFrame.pack(side=TOP, fill=X)
+        resetButton = ttk.Button(leftFrame, text="Reset", padding=5,
+            style='dashboard.TButton', command=self._resetButtonPressed)
+        resetButton.pack(side=TOP, fill=X)
 
-        self.switchVars = { }
+        self.ipComboBoxVar = StringVar()
+        ipComboBox = ttk.Combobox(leftFrame, textvariable=self.ipComboBoxVar,
+            values=['10.26.5.2',
+                    socket.gethostbyname(socket.gethostname()),
+                    'roborio-2605-frc.local',
+                    'test'])
+        ipComboBox.current(0)
+        ipComboBox.pack(side=TOP, fill=X)
 
         self.progressVar = IntVar()
         self.progress = ttk.Progressbar(leftFrame, mode='determinate',
@@ -154,9 +161,11 @@ class ThisIsTheDashboardApp:
             padding=5, state=DISABLED)
         self.commandButton.pack(side=TOP, fill=X)
 
-        resetButton = ttk.Button(leftFrame, text="Reset", padding=5,
-            style='dashboard.TButton', command=self._resetButtonPressed)
-        resetButton.pack(side=TOP, fill=X)
+        self.switchFrame = ttk.Frame(leftFrame, borderwidth=3, relief=GROOVE,
+                                     padding=8)
+        self.switchFrame.pack(side=TOP, fill=X)
+
+        self.switchVars = { }
 
         self.logFrame = ttk.Frame(frame, padding=(50, 0, 0, 0))
         self.logFrame.pack(side=TOP, fill=X, expand=True, anchor=N)
@@ -165,15 +174,14 @@ class ThisIsTheDashboardApp:
 
 
     def _connectButtonPressed(self):
-        global TEST_MODE
-
         messagebox.showerror("Warning!!", "Make sure battery is strapped in!")
 
+        ip = self.ipComboBoxVar.get()
         try:
-            if TEST_MODE:
+            if ip.strip().lower() == 'test':
                 self.robotConnection = TestRobotConnection()
             else:
-                self.robotConnection = RobotConnection()
+                self.robotConnection = RobotConnection(ip)
             self._waiting()
             self.waitCount = 0
             self._waitForConnection()
@@ -209,7 +217,6 @@ class ThisIsTheDashboardApp:
             return
         self.robotConnection.disconnect()
         self._disconnected()
-        self._resetButtonPressed()
 
     def _resetButtonPressed(self):
         self.logStateLabels = { }
@@ -238,6 +245,7 @@ class ThisIsTheDashboardApp:
         self.commandButton.config(state=DISABLED)
         self.progress.stop()
         self.progressVar.set(0)
+        self._resetButtonPressed()
 
     def _disconnectedError(self):
         self._disconnected()
