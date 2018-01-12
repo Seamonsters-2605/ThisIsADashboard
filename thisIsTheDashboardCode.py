@@ -211,6 +211,7 @@ class ThisIsTheDashboardApp:
             return
         self.robotConnection.disconnect()
         self._disconnectedSuccess()
+        self._resetButtonPressed()
 
     def _resetButtonPressed(self):
         self.logStateLabels = { }
