@@ -101,6 +101,8 @@ class ThisIsTheDashboardApp:
         self.switchFileName = switchFileName
 
         style = ttk.Style()
+        style.configure('logo.TLabel', font=('System', 60),
+                        foreground="#008800")
         style.configure('switch.TCheckbutton', font=('Segoe UI', 12))
         style.configure('dashboard.TButton', font=('Segoe UI', 12))
         style.configure('connected.TButton', font=('Segoe UI', 12),
@@ -123,6 +125,8 @@ class ThisIsTheDashboardApp:
 
         leftFrame = ttk.Frame(frame)
         leftFrame.pack(side=LEFT)
+
+        ttk.Label(leftFrame, text="2605", style='logo.TLabel').pack(side=TOP)
 
         self.switchFrame = ttk.Frame(leftFrame, borderwidth=3, relief=GROOVE,
                                      padding=8)
