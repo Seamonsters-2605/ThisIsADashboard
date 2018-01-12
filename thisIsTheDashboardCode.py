@@ -33,7 +33,7 @@ class RobotConnection:
             for i in range(0, len(logStateNames)):
                 logStates[logStateNames[i]] = logStateValues[i]
             return logStates
-        except BaseException:
+        except:
             return { }
 
     def sendSwitchData(self, switches):
@@ -44,7 +44,11 @@ class RobotConnection:
         self.table.putBooleanArray('switchvalues', switchValues)
 
     def sendCommand(self, command):
-        lastId = self.commandTable.getNumber('id')
+        try:
+            lastId = self.commandTable.getNumber('id')
+        except:
+            print("Robot won't accept commands!")
+            return
         newId = lastId
         while newId == lastId:
             newId = random.randrange(1, 65536)
@@ -122,7 +126,7 @@ class ThisIsTheDashboardApp:
 
         ttk.Label(leftFrame, text="2605", style='logo.TLabel').pack(side=TOP)
 
-        resetButton = ttk.Button(leftFrame, text="Reset", padding=5,
+        resetButton = ttk.Button(leftFrame, text="Reset",
             style='dashboard.TButton', command=self._resetButtonPressed)
         resetButton.pack(side=TOP, fill=X)
 
@@ -152,14 +156,17 @@ class ThisIsTheDashboardApp:
             command=self._disconnectButtonPressed)
         self.disconnectButton.pack(side=LEFT, fill=X, expand=True)
 
-        self.commandEntry = ttk.Entry(leftFrame)
-        self.commandEntry.pack(side=TOP, fill=X)
+        commandFrame = ttk.Frame(leftFrame)
+        commandFrame.pack(side=TOP, fill=X)
+
+        self.commandEntry = ttk.Entry(commandFrame)
+        self.commandEntry.pack(side=LEFT, fill=BOTH, expand=True)
         self.commandEntry.focus()
 
-        self.commandButton = ttk.Button(leftFrame, text="Run command",
+        self.commandButton = ttk.Button(commandFrame, text="Send", width=5,
             style='dashboard.TButton', command=self._commandButtonPressed,
-            padding=5, state=DISABLED)
-        self.commandButton.pack(side=TOP, fill=X)
+            state=DISABLED)
+        self.commandButton.pack(side=LEFT)
 
         self.switchFrame = ttk.Frame(leftFrame, borderwidth=3, relief=GROOVE,
                                      padding=8)
