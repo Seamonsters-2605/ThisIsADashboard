@@ -105,8 +105,6 @@ class ThisIsTheDashboardApp:
                         foreground="#000000")
         style.configure('connected.TLabel', font=('System', 60),
                         foreground="#00BB00")
-        style.configure('error.TLabel', font=('System', 60),
-                        foreground="#FF0000")
         style.configure('wait.TLabel', font=('System', 60),
                         foreground="#CEC704")
         style.configure('switch.TCheckbutton', font=('Segoe UI', 12))
@@ -210,7 +208,7 @@ class ThisIsTheDashboardApp:
             self._disconnectedError()
             return
         self.robotConnection.disconnect()
-        self._disconnectedSuccess()
+        self._disconnected()
         self._resetButtonPressed()
 
     def _resetButtonPressed(self):
@@ -231,7 +229,7 @@ class ThisIsTheDashboardApp:
         self.disconnectButton.config(state=DISABLED)
         self.commandButton.config(state=DISABLED)
 
-    def _disconnectedSuccess(self):
+    def _disconnected(self):
         self.robotConnection = None
         self.logo.config(style='disconnected.TLabel')
         self.connectButton.config(state=NORMAL)
@@ -239,11 +237,9 @@ class ThisIsTheDashboardApp:
         self.commandButton.config(state=DISABLED)
 
     def _disconnectedError(self):
-        self.robotConnection = None
-        self.logo.config(style='error.TLabel')
-        self.connectButton.config(state=NORMAL)
-        self.disconnectButton.config(state=DISABLED)
-        self.commandButton.config(state=DISABLED)
+        self._disconnected()
+        messagebox.showerror("Dashboard Error", "Connection Failed!")
+
 
     def _updateSwitches(self):
         with open(self.switchFileName) as f:
