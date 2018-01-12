@@ -101,17 +101,16 @@ class ThisIsTheDashboardApp:
         self.switchFileName = switchFileName
 
         style = ttk.Style()
-        style.configure('logo.TLabel', font=('System', 60),
-                        foreground="#008800")
+        style.configure('disconnected.TLabel', font=('System', 60),
+                        foreground="#000000")
+        style.configure('connected.TLabel', font=('System', 60),
+                        foreground="#00BB00")
+        style.configure('error.TLabel', font=('System', 60),
+                        foreground="#FF0000")
+        style.configure('wait.TLabel', font=('System', 60),
+                        foreground="#CEC704")
         style.configure('switch.TCheckbutton', font=('Segoe UI', 12))
         style.configure('dashboard.TButton', font=('Segoe UI', 12))
-        style.configure('connected.TButton', font=('Segoe UI', 12),
-                        background="#55FF55")
-        style.configure('disconnected.TButton', font=('Segoe UI', 12))
-        style.configure('error.TButton', font=('Segoe UI', 12),
-                        background="#FF7777", foreground="#FF7777")
-        style.configure('wait.TButton', font=('Segoe UI', 12),
-                        background="#FFFF77")
 
         self._buildUI(root)
         self._updateSwitches()
@@ -126,7 +125,9 @@ class ThisIsTheDashboardApp:
         leftFrame = ttk.Frame(frame)
         leftFrame.pack(side=LEFT, fill=Y, expand=True)
 
-        ttk.Label(leftFrame, text="2605", style='logo.TLabel').pack(side=TOP)
+        self.logo = ttk.Label(leftFrame, text="2605",
+                              style='disconnected.TLabel')
+        self.logo.pack(side=TOP)
 
         self.switchFrame = ttk.Frame(leftFrame, borderwidth=3, relief=GROOVE,
                                      padding=8)
@@ -138,7 +139,7 @@ class ThisIsTheDashboardApp:
         connectFrame.pack(side=TOP, fill=X)
 
         self.connectButton = ttk.Button(connectFrame, text="Connect",
-            style='disconnected.TButton', command=self._connectButtonPressed,
+            style='dashboard.TButton', command=self._connectButtonPressed,
             padding=5)
         self.connectButton.pack(side=LEFT, fill=X, expand=True)
         self.disconnectButton = ttk.Button(connectFrame, text="Disconnect",
@@ -218,24 +219,28 @@ class ThisIsTheDashboardApp:
         self._updateSwitches()
 
     def _connected(self):
-        self.connectButton.config(style='connected.TButton', state=DISABLED)
+        self.logo.config(style='connected.TLabel')
+        self.connectButton.config(state=DISABLED)
         self.disconnectButton.config(state=NORMAL)
         self.commandButton.config(state=NORMAL)
 
     def _waiting(self):
-        self.connectButton.config(style='wait.TButton', state=DISABLED)
+        self.logo.config(style='wait.TLabel')
+        self.connectButton.config(state=DISABLED)
         self.disconnectButton.config(state=DISABLED)
         self.commandButton.config(state=DISABLED)
 
     def _disconnectedSuccess(self):
         self.robotConnection = None
-        self.connectButton.config(style='disconnected.TButton', state=NORMAL)
+        self.logo.config(style='disconnected.TLabel')
+        self.connectButton.config(state=NORMAL)
         self.disconnectButton.config(state=DISABLED)
         self.commandButton.config(state=DISABLED)
 
     def _disconnectedError(self):
         self.robotConnection = None
-        self.connectButton.config(style='error.TButton', state=NORMAL)
+        self.logo.config(style='error.TLabel')
+        self.connectButton.config(state=NORMAL)
         self.disconnectButton.config(state=DISABLED)
         self.commandButton.config(state=DISABLED)
 
