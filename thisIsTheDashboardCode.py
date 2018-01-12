@@ -92,6 +92,7 @@ class TestRobotConnection:
 
 class ThisIsTheDashboardApp:
 
+    LOG_STATE_TITLE_FONT = ("Segoe UI", 24)
     LOG_STATE_FONT = ("Segoe UI Light", 24)
     IMPORTANT_LOG_STATE_FONT = ("Segoe UI", 24, "bold underline")
 
@@ -285,7 +286,7 @@ class ThisIsTheDashboardApp:
         stateFrame.pack(side=TOP, fill=X)
         
         titleLabel = ttk.Label(stateFrame, text=name + ": ",
-                               font=ThisIsTheDashboardApp.LOG_STATE_FONT,
+                               font=ThisIsTheDashboardApp.LOG_STATE_TITLE_FONT,
                                background=color)
         titleLabel.pack(side=LEFT)
         valueLabel = ttk.Label(stateFrame, text="None",
