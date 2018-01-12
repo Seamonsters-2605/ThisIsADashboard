@@ -124,7 +124,7 @@ class ThisIsTheDashboardApp:
         frame.pack(fill=BOTH, expand=True)
 
         leftFrame = ttk.Frame(frame)
-        leftFrame.pack(side=LEFT)
+        leftFrame.pack(side=LEFT, fill=Y, expand=True)
 
         ttk.Label(leftFrame, text="2605", style='logo.TLabel').pack(side=TOP)
 
@@ -147,17 +147,17 @@ class ThisIsTheDashboardApp:
         self.disconnectButton.pack(side=LEFT, fill=X, expand=True)
 
         self.commandEntry = ttk.Entry(leftFrame)
-        self.commandEntry.pack(side=TOP, fill=X, expand=True)
+        self.commandEntry.pack(side=TOP, fill=X)
         self.commandEntry.focus()
 
         self.commandButton = ttk.Button(leftFrame, text="Run command",
             style='dashboard.TButton', command=self._commandButtonPressed,
             padding=5, state=DISABLED)
-        self.commandButton.pack(side=TOP, fill=X, expand=True)
+        self.commandButton.pack(side=TOP, fill=X)
 
         resetButton = ttk.Button(leftFrame, text="Reset", padding=5,
             style='dashboard.TButton', command=self._resetButtonPressed)
-        resetButton.pack(side=TOP, fill=X, expand=True)
+        resetButton.pack(side=TOP, fill=X)
 
         padFrame = ttk.Frame(frame, width=8)
         padFrame.pack(side=LEFT)
