@@ -95,6 +95,7 @@ class ThisIsTheDashboardApp:
     LOG_STATE_TITLE_FONT = ("Segoe UI", 24)
     LOG_STATE_FONT = ("Segoe UI Light", 24)
     IMPORTANT_LOG_STATE_FONT = ("Segoe UI", 24, "bold underline")
+    PROGRESS_MAX = 110
 
     def __init__(self, root, switchFileName):
         self.robotConnection = None
@@ -129,7 +130,7 @@ class ThisIsTheDashboardApp:
 
         self.progressVar = IntVar()
         self.progress = ttk.Progressbar(leftFrame, mode='determinate',
-                                        var=self.progressVar, maximum=105)
+            var=self.progressVar, maximum=ThisIsTheDashboardApp.PROGRESS_MAX)
         self.progress.pack(side=TOP, fill=X)
 
         connectFrame = ttk.Frame(leftFrame)
@@ -221,7 +222,7 @@ class ThisIsTheDashboardApp:
         self.disconnectButton.config(state=NORMAL)
         self.commandButton.config(state=NORMAL)
         self.progress.stop()
-        self.progressVar.set(105)
+        self.progressVar.set(maximum=ThisIsTheDashboardApp.PROGRESS_MAX)
 
     def _waiting(self):
         self.connectButton.config(state=DISABLED)
