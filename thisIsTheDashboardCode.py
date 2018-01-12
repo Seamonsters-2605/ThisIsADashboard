@@ -92,22 +92,21 @@ class TestRobotConnection:
 
 class ThisIsTheDashboardApp:
 
-    LOG_STATE_FONT = ("Helvetica", 24)
-    IMPORTANT_LOG_STATE_FONT = ("Helvetica", 24, "bold underline")
+    LOG_STATE_FONT = ("Segoe UI Light", 24)
+    IMPORTANT_LOG_STATE_FONT = ("Segoe UI", 24, "bold underline")
 
     def __init__(self, root, switches):
         self.robotConnection = None
 
         style = ttk.Style()
-        style.configure('switch.TCheckbutton', font=('Helvetica', 12))
-        style.configure('dashboard.TButton', font=('Helvetica', 12))
-        style.configure('connected.TButton', font=('Helvetica', 12),
+        style.configure('switch.TCheckbutton', font=('Segoe UI', 12))
+        style.configure('dashboard.TButton', font=('Segoe UI', 12))
+        style.configure('connected.TButton', font=('Segoe UI', 12),
                         background="#55FF55")
-        style.configure('disconnected.TButton', font=('Helvetica', 12),
-                        background="#CCCCCC")
-        style.configure('error.TButton', font=('Helvetica', 12),
-                        background="#FF7777")
-        style.configure('wait.TButton', font=('Helvetica', 12),
+        style.configure('disconnected.TButton', font=('Segoe UI', 12))
+        style.configure('error.TButton', font=('Segoe UI', 12),
+                        background="#FF7777", foreground="#FF7777")
+        style.configure('wait.TButton', font=('Segoe UI', 12),
                         background="#FFFF77")
 
         self._buildUI(root, switches)
@@ -146,11 +145,12 @@ class ThisIsTheDashboardApp:
         connectFrame.pack(side=TOP, fill=X)
 
         self.connectButton = ttk.Button(connectFrame, text="Connect",
-            style='disconnected.TButton', command=self._connectButtonPressed)
+            style='disconnected.TButton', command=self._connectButtonPressed,
+            padding=5)
         self.connectButton.pack(side=LEFT, fill=X, expand=True)
         self.disconnectButton = ttk.Button(connectFrame, text="Disconnect",
-            style='dashboard.TButton', state=DISABLED,
-            command = self._disconnectButtonPressed)
+            style='dashboard.TButton', state=DISABLED, padding=5,
+            command=self._disconnectButtonPressed)
         self.disconnectButton.pack(side=LEFT, fill=X, expand=True)
 
         self.commandEntry = ttk.Entry(leftFrame)
@@ -159,10 +159,10 @@ class ThisIsTheDashboardApp:
 
         self.commandButton = ttk.Button(leftFrame, text="Run command",
             style='dashboard.TButton', command=self._commandButtonPressed,
-            state=DISABLED)
+            padding=5, state=DISABLED)
         self.commandButton.pack(side=TOP, fill=X, expand=True)
 
-        resetButton = ttk.Button(leftFrame, text="Reset",
+        resetButton = ttk.Button(leftFrame, text="Reset", padding=5,
             style='dashboard.TButton', command=self._resetButtonPressed)
         resetButton.pack(side=TOP, fill=X, expand=True)
 
@@ -284,7 +284,7 @@ class ThisIsTheDashboardApp:
                            borderwidth=3, relief=RAISED)
         stateFrame.pack(side=TOP, fill=X)
         
-        titleLabel = ttk.Label(stateFrame, text=name + ":",
+        titleLabel = ttk.Label(stateFrame, text=name + ": ",
                                font=ThisIsTheDashboardApp.LOG_STATE_FONT,
                                background=color)
         titleLabel.pack(side=LEFT)
