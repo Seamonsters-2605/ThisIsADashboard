@@ -101,12 +101,8 @@ class ThisIsTheDashboardApp:
         self.switchFileName = switchFileName
 
         style = ttk.Style()
-        style.configure('disconnected.TLabel', font=('System', 60),
-                        foreground="#000000")
-        style.configure('connected.TLabel', font=('System', 60),
+        style.configure('logo.TLabel', font=('System', 60),
                         foreground="#00BB00")
-        style.configure('wait.TLabel', font=('System', 60),
-                        foreground="#CEC704")
         style.configure('switch.TCheckbutton', font=('Segoe UI', 12))
         style.configure('dashboard.TButton', font=('Segoe UI', 12))
 
@@ -123,15 +119,18 @@ class ThisIsTheDashboardApp:
         leftFrame = ttk.Frame(frame)
         leftFrame.pack(side=LEFT, fill=Y)
 
-        self.logo = ttk.Label(leftFrame, text="2605",
-                              style='disconnected.TLabel')
-        self.logo.pack(side=TOP)
+        ttk.Label(leftFrame, text="2605", style='logo.TLabel').pack(side=TOP)
 
         self.switchFrame = ttk.Frame(leftFrame, borderwidth=3, relief=GROOVE,
                                      padding=8)
         self.switchFrame.pack(side=TOP, fill=X)
 
         self.switchVars = { }
+
+        self.progressVar = IntVar()
+        self.progress = ttk.Progressbar(leftFrame, mode='determinate',
+                                        var=self.progressVar, maximum=105)
+        self.progress.pack(side=TOP, fill=X)
 
         connectFrame = ttk.Frame(leftFrame)
         connectFrame.pack(side=TOP, fill=X)
@@ -218,23 +217,26 @@ class ThisIsTheDashboardApp:
         self._updateSwitches()
 
     def _connected(self):
-        self.logo.config(style='connected.TLabel')
         self.connectButton.config(state=DISABLED)
         self.disconnectButton.config(state=NORMAL)
         self.commandButton.config(state=NORMAL)
+        self.progress.stop()
+        self.progressVar.set(105)
 
     def _waiting(self):
-        self.logo.config(style='wait.TLabel')
         self.connectButton.config(state=DISABLED)
         self.disconnectButton.config(state=DISABLED)
         self.commandButton.config(state=DISABLED)
+        self.progressVar.set(0)
+        self.progress.start()
 
     def _disconnected(self):
         self.robotConnection = None
-        self.logo.config(style='disconnected.TLabel')
         self.connectButton.config(state=NORMAL)
         self.disconnectButton.config(state=DISABLED)
         self.commandButton.config(state=DISABLED)
+        self.progress.stop()
+        self.progressVar.set(0)
 
     def _disconnectedError(self):
         self._disconnected()
