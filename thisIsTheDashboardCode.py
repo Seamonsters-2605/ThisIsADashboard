@@ -116,7 +116,7 @@ class ThisIsTheDashboardApp:
 
     def _buildUI(self, root):
         self.root = root
-        root.title("Seamonsters Dashboard! (1187/1188)")
+        root.title("Dashboard (1187/1188)")
         
         frame = ttk.Frame(root)
         frame.pack(fill=BOTH, expand=True)
