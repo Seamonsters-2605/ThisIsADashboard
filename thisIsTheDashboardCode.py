@@ -96,8 +96,9 @@ class ThisIsTheDashboardApp:
     LOG_STATE_FONT = ("Segoe UI Light", 24)
     IMPORTANT_LOG_STATE_FONT = ("Segoe UI", 24, "bold underline")
 
-    def __init__(self, root, switches):
+    def __init__(self, root, switchFileName):
         self.robotConnection = None
+        self.switchFileName = switchFileName
 
         style = ttk.Style()
         style.configure('switch.TCheckbutton', font=('Segoe UI', 12))
@@ -110,9 +111,10 @@ class ThisIsTheDashboardApp:
         style.configure('wait.TButton', font=('Segoe UI', 12),
                         background="#FFFF77")
 
-        self._buildUI(root, switches)
+        self._buildUI(root)
+        self._updateSwitches()
 
-    def _buildUI(self, root, switches):
+    def _buildUI(self, root):
         self.root = root
         root.title("Seamonsters Dashboard! (1187/1188)")
         
@@ -122,25 +124,11 @@ class ThisIsTheDashboardApp:
         leftFrame = ttk.Frame(frame)
         leftFrame.pack(side=LEFT)
 
-        switchFrame = ttk.Frame(leftFrame, borderwidth=3, relief=GROOVE,
-                                padding=8)
-        switchFrame.pack(side=TOP, fill=X)
+        self.switchFrame = ttk.Frame(leftFrame, borderwidth=3, relief=GROOVE,
+                                     padding=8)
+        self.switchFrame.pack(side=TOP, fill=X)
 
         self.switchVars = { }
-
-        for switch, enabled in switches.items():
-            var = IntVar()
-            self.switchVars[switch] = var
-
-            checkbuttonFrame = ttk.Frame(switchFrame)
-            checkbuttonFrame.pack(side=TOP, fill=X)
-            
-            checkbutton = ttk.Checkbutton(checkbuttonFrame, text=switch,
-                variable=var, command=self._sendSwitchData,
-                style='switch.TCheckbutton')
-            if enabled:
-                var.set(1)
-            checkbutton.pack(side=LEFT)
 
         connectFrame = ttk.Frame(leftFrame)
         connectFrame.pack(side=TOP, fill=X)
@@ -226,6 +214,7 @@ class ThisIsTheDashboardApp:
         self.logStateLabels = { }
         for child in self.logFrame.winfo_children():
             child.destroy()
+        self._updateSwitches()
 
     def _connected(self):
         self.connectButton.config(style='connected.TButton', state=DISABLED)
@@ -248,6 +237,27 @@ class ThisIsTheDashboardApp:
         self.connectButton.config(style='error.TButton', state=NORMAL)
         self.disconnectButton.config(state=DISABLED)
         self.commandButton.config(state=DISABLED)
+
+    def _updateSwitches(self):
+        with open(self.switchFileName) as f:
+            switches = readSwitchConfig(f)
+
+        for child in self.switchFrame.winfo_children():
+            child.destroy()
+        self.switchVars = { }
+        for switch, enabled in switches.items():
+            var = IntVar()
+            self.switchVars[switch] = var
+
+            checkbuttonFrame = ttk.Frame(self.switchFrame)
+            checkbuttonFrame.pack(side=TOP, fill=X)
+
+            checkbutton = ttk.Checkbutton(checkbuttonFrame, text=switch,
+                variable=var, command=self._sendSwitchData,
+                style='switch.TCheckbutton')
+            if enabled:
+                var.set(1)
+            checkbutton.pack(side=LEFT)
 
     def _sendSwitchData(self):
         if self.robotConnection == None:
@@ -332,14 +342,12 @@ def readSwitchConfig(file):
 
 if __name__ == "__main__":
     root = Tk()
-    file = filedialog.askopenfile(title="Choose a switches file...",
-                                  filetypes=[('Text Files', '*.txt'),
-                                             ('All Files', '*')])
-    if file == None:
+    filename = filedialog.askopenfilename(title="Choose a switches file...",
+                                          filetypes=[('Text Files', '*.txt'),
+                                                     ('All Files', '*')])
+    if filename == '':
         exit()
-    switches = readSwitchConfig(file)
-    file.close()
 
     root.geometry("+112+0")
-    app = ThisIsTheDashboardApp(root, switches = switches)
+    app = ThisIsTheDashboardApp(root, switchFileName=filename)
     root.mainloop()
