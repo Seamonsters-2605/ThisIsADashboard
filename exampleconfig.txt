@@ -1,7 +1,0 @@
-+voltage
-+connection
-+auto shoot ball
--light
--sound
--smell
-+camera
