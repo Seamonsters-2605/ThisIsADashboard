@@ -9,6 +9,7 @@ import colorsys
 from networktables import NetworkTables
 import random
 import socket
+import traceback
 
 
 class RobotConnection:
@@ -27,13 +28,14 @@ class RobotConnection:
 
     def getLogStates(self):
         try:
-            logStateNames = self.table.getStringArray('logstatenames')
-            logStateValues = self.table.getStringArray('logstatevalues')
+            logStateNames = self.table.getStringArray('logstatenames', [])
+            logStateValues = self.table.getStringArray('logstatevalues', [])
             logStates = { }
             for i in range(0, len(logStateNames)):
                 logStates[logStateNames[i]] = logStateValues[i]
             return logStates
         except:
+            traceback.print_exc()
             return { }
 
     def sendSwitchData(self, switches):
