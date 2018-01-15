@@ -1,6 +1,8 @@
 # ThisIsADashboard
 It uses tkinter and it works.
 
+![Screenshot](https://raw.githubusercontent.com/Seamonsters-2605/ThisIsADashboard/master/screenshot.png)
+
 ## Features
 
 - Allows configurable switches for enabling or disabling features.
