@@ -52,7 +52,7 @@ class RobotConnection:
         print(lastId, newId)
         self.commandTable.putString('command', command)
         self.commandTable.putNumber('id', newId)
-        print(self.commandTable.getString('command'))
+        print(self.commandTable.getString('command', 'NO COMMAND!'))
 
 
 class TestRobotConnection:
