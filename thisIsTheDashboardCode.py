@@ -27,16 +27,12 @@ class RobotConnection:
         NetworkTables.shutdown()
 
     def getLogStates(self):
-        try:
-            logStateNames = self.table.getStringArray('logstatenames', [])
-            logStateValues = self.table.getStringArray('logstatevalues', [])
-            logStates = { }
-            for i in range(0, len(logStateNames)):
-                logStates[logStateNames[i]] = logStateValues[i]
-            return logStates
-        except:
-            traceback.print_exc()
-            return { }
+        logStateNames = self.table.getStringArray('logstatenames', [])
+        logStateValues = self.table.getStringArray('logstatevalues', [])
+        logStates = { }
+        for i in range(0, len(logStateNames)):
+            logStates[logStateNames[i]] = logStateValues[i]
+        return logStates
 
     def sendSwitchData(self, switches):
         print(switches)
@@ -46,9 +42,8 @@ class RobotConnection:
         self.table.putBooleanArray('switchvalues', switchValues)
 
     def sendCommand(self, command):
-        try:
-            lastId = self.commandTable.getNumber('id')
-        except:
+        lastId = self.commandTable.getNumber('id', None)
+        if lastId == None:
             print("Robot won't accept commands!")
             return
         newId = lastId
