@@ -135,7 +135,11 @@ class CameraStream:
 
     def run(self):
         print("Starting camera stream...")
-        stream = requests.get(self.url, stream=True)
+        try:
+            stream = requests.get(self.url, stream=True)
+        except:
+            print("Couldn't connect to camera")
+            return
         self.stopThread = False
         streamBytes = bytes()
         try:
