@@ -1,30 +1,54 @@
 __author__ = "seamonsters"
 
-from tkinter import *
-from tkinter import ttk
 import hashlib
-from tkinter import filedialog
-from tkinter import messagebox
 import colorsys
-from networktables import NetworkTables
 import random
 import socket
-import traceback
+
+from tkinter import *
+from tkinter import ttk
+from tkinter import filedialog
+from tkinter import messagebox
+from PIL import Image
+from PIL import ImageTk
+
+from networktables import NetworkTables
+
+try:
+    import numpy as np
+    try:
+        from cv2 import cv2 # idk
+    except:
+        import cv2
+except:
+    print("Camera support is not available! (numpy and cv2 are required)")
+import requests
+from threading import Thread
 
 
 class RobotConnection:
 
-    def __init__(self, ip):
+    def __init__(self, ip, cameraStreamLabel):
         print("Attempting to connect to", ip)
         NetworkTables.initialize(server=ip)
         self.table = NetworkTables.getTable('dashboard')
         self.commandTable = NetworkTables.getTable('commands')
+        self.cam = None
+        try:
+            cv2 # check if it's imported
+            self.cam = CameraStream('http://' + ip + ':1187/stream.mjpg',
+                                    cameraStreamLabel)
+            self.cam.start()
+        except:
+            pass
 
     def isConnected(self):
         return NetworkTables.isConnected()
 
     def disconnect(self):
         NetworkTables.shutdown()
+        if self.cam:
+            self.cam.stop()
 
     def getLogStates(self):
         logStateNames = self.table.getStringArray('logstatenames', [])
@@ -89,6 +113,48 @@ class TestRobotConnection:
 
     def sendCommand(self, command):
         print("Command:", command)
+
+
+# http://benhowell.github.io/guide/2015/03/09/opencv-and-web-cam-streaming
+class CameraStream:
+
+    def __init__(self, url, cameraStreamLabel):
+        self.url = url
+        self.thread = Thread(target=self.run)
+        self.label = cameraStreamLabel
+        print("Camera initialised")
+
+    def start(self):
+        self.thread.start()
+
+    def isRunning(self):
+        return self.thread.is_alive()
+
+    def stop(self):
+        self.stopThread = True
+
+    def run(self):
+        print("Starting camera stream...")
+        stream = requests.get(self.url, stream=True)
+        self.stopThread = False
+        streamBytes = bytes()
+        try:
+            while not self.stopThread:
+                streamBytes += stream.raw.read(1024)
+                a = streamBytes.find(b'\xff\xd8')
+                b = streamBytes.find(b'\xff\xd9')
+                if a != -1 and b != -1:
+                    jpg = streamBytes[a:b + 2]
+                    streamBytes = streamBytes[b + 2:]
+                    image = cv2.imdecode(
+                        np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
+                    image = Image.fromarray(image)
+                    image = ImageTk.PhotoImage(image)
+                    self.label.config(image=image)
+                    self.label.image = image
+        finally:
+            stream.close()
+            print("Camera stream stopped")
 
 
 class ThisIsTheDashboardApp:
@@ -172,9 +238,12 @@ class ThisIsTheDashboardApp:
         self.switchVars = { }
 
         self.logFrame = ttk.Frame(frame, padding=(50, 0, 0, 0))
-        self.logFrame.pack(side=TOP, fill=X, expand=True, anchor=N)
+        self.logFrame.pack(side=LEFT, fill=X, expand=True, anchor=N)
         
         self.logStateLabels = { }
+
+        self.cameraStreamLabel = Label(frame)
+        self.cameraStreamLabel.pack(side=LEFT, anchor=N)
 
 
     def _connectButtonPressed(self):
@@ -185,7 +254,8 @@ class ThisIsTheDashboardApp:
             if ip.strip().lower() == 'test':
                 self.robotConnection = TestRobotConnection()
             else:
-                self.robotConnection = RobotConnection(ip)
+                self.robotConnection = RobotConnection(ip,
+                                                       self.cameraStreamLabel)
             self._waiting()
             self.waitCount = 0
             self._waitForConnection()
@@ -227,6 +297,8 @@ class ThisIsTheDashboardApp:
         for child in self.logFrame.winfo_children():
             child.destroy()
         self._updateSwitches()
+        self.cameraStreamLabel.config(image='')
+        self.cameraStreamLabel.image = None
 
     def _connected(self):
         self.connectButton.config(state=DISABLED)
