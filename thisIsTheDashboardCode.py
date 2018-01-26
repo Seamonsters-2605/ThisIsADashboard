@@ -9,20 +9,20 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
-from PIL import Image
-from PIL import ImageTk
 
 from networktables import NetworkTables
 
 try:
+    from PIL import Image
+    from PIL import ImageTk
     import numpy as np
+    import requests
     try:
         from cv2 import cv2 # idk
     except:
         import cv2
 except:
-    print("Camera support is not available! (numpy and cv2 are required)")
-import requests
+    print("Camera support is not available! (numpy, cv2, pillow, requests required)")
 from threading import Thread
 
 
