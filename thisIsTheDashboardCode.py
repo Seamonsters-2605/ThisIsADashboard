@@ -300,7 +300,8 @@ class ThisIsTheDashboardApp:
         self.logStateLabels = { }
         for child in self.logFrame.winfo_children():
             child.destroy()
-        self._updateSwitches()
+        # taking this out for now, it resets all of the switch values which might be bad
+        #self._updateSwitches()
         self.cameraStreamLabel.config(image='')
         self.cameraStreamLabel.image = None
 
