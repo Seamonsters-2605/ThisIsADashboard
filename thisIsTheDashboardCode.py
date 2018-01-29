@@ -443,6 +443,6 @@ if __name__ == "__main__":
     if filename == '':
         exit()
 
-    root.geometry("+112+0")
+    root.geometry("+0+0")
     app = ThisIsTheDashboardApp(root, switchFileName=filename)
     root.mainloop()
