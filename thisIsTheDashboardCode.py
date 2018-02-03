@@ -244,13 +244,13 @@ class ThisIsTheDashboardApp:
 
         self.switchVars = { }
 
+        self.cameraStreamLabel = Label(frame)
+        self.cameraStreamLabel.pack(side=LEFT, anchor=N)
+
         self.logFrame = ttk.Frame(frame, padding=(20, 0, 0, 0))
         self.logFrame.pack(side=LEFT, fill=X, expand=True, anchor=N)
         
         self.logStateLabels = { }
-
-        self.cameraStreamLabel = Label(frame)
-        self.cameraStreamLabel.pack(side=LEFT, anchor=N)
 
 
     def _connectButtonPressed(self):
