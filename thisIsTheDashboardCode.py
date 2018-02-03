@@ -153,6 +153,7 @@ class CameraStream:
                     image = cv2.imdecode(
                         np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
                     image = Image.fromarray(image)
+                    image = image.resize((image.width * 2, image.height * 2))
                     image = ImageTk.PhotoImage(image)
                     self.label.config(image=image)
                     self.label.image = image
@@ -163,9 +164,9 @@ class CameraStream:
 
 class ThisIsTheDashboardApp:
 
-    LOG_STATE_TITLE_FONT = ("Segoe UI", 24)
-    LOG_STATE_FONT = ("Segoe UI Light", 24)
-    IMPORTANT_LOG_STATE_FONT = ("Segoe UI", 24, "bold underline")
+    LOG_STATE_TITLE_FONT = ("Segoe UI", 18)
+    LOG_STATE_FONT = ("Segoe UI Light", 18)
+    IMPORTANT_LOG_STATE_FONT = ("Segoe UI", 18, "bold underline")
     PROGRESS_MAX = 110
 
     def __init__(self, root, switchFileName):
@@ -241,7 +242,7 @@ class ThisIsTheDashboardApp:
 
         self.switchVars = { }
 
-        self.logFrame = ttk.Frame(frame, padding=(50, 0, 0, 0))
+        self.logFrame = ttk.Frame(frame, padding=(20, 0, 0, 0))
         self.logFrame.pack(side=LEFT, fill=X, expand=True, anchor=N)
         
         self.logStateLabels = { }
