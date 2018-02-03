@@ -153,6 +153,8 @@ class CameraStream:
                     image = cv2.imdecode(
                         np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
                     image = Image.fromarray(image)
+                    b, g, r = image.split()
+                    image = Image.merge("RGB", (r, g, b))
                     image = image.resize((image.width * 2, image.height * 2))
                     image = ImageTk.PhotoImage(image)
                     self.label.config(image=image)
