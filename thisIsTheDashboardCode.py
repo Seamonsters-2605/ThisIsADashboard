@@ -22,7 +22,7 @@ try:
     except:
         import cv2
 except:
-    print("Camera support is not available! (numpy, cv2, pillow, requests required)")
+    print("Camera support is not available! (numpy, opencv-python, pillow, requests required)")
 from threading import Thread
 
 
