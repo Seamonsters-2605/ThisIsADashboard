@@ -34,13 +34,7 @@ class RobotConnection:
         self.table = NetworkTables.getTable('dashboard')
         self.commandTable = NetworkTables.getTable('commands')
         self.cam = None
-        try:
-            cv2 # check if it's imported
-            self.cam = CameraStream('http://' + ip + ':1187/stream.mjpg',
-                                    cameraStreamLabel)
-            self.cam.start()
-        except:
-            pass
+        self.cameraStreamLabel = cameraStreamLabel
 
     def isConnected(self):
         return NetworkTables.isConnected()
@@ -51,12 +45,30 @@ class RobotConnection:
             self.cam.stop()
 
     def getLogStates(self):
+        self.updateCamera()
         logStateNames = self.table.getStringArray('logstatenames', [])
         logStateValues = self.table.getStringArray('logstatevalues', [])
         logStates = { }
         for i in range(0, len(logStateNames)):
             logStates[logStateNames[i]] = logStateValues[i]
         return logStates
+
+    def updateCamera(self):
+        url = self.table.getString('cam', '')
+        if url == '':
+            if self.cam != None:
+                self.cam.stop()
+                self.cam = None
+        else:
+            if self.cam != None and url != self.cam.url:
+                self.cam.stop()
+                self.cam = None
+            if self.cam == None:
+                try:
+                    self.cam = CameraStream(url, self.cameraStreamLabel)
+                    self.cam.start()
+                except:
+                    pass
 
     def sendSwitchData(self, switches):
         print(switches)
