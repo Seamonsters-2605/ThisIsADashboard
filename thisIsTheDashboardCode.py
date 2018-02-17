@@ -269,8 +269,6 @@ class ThisIsTheDashboardApp:
 
 
     def _connectButtonPressed(self):
-        messagebox.showerror("Warning!!", "Make sure battery is strapped in!")
-
         ip = self.ipComboBoxVar.get()
         try:
             if ip.strip().lower() == 'test':
