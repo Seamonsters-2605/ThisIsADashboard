@@ -299,6 +299,10 @@ class ThisIsTheDashboardApp:
         self.robotConnection.disconnect()
         self._disconnected()
 
+    def _setComboVar(self, name, index, mode):
+        print(name, index, mode)
+        print(self.optionVars[name])
+
     def _resetButtonPressed(self):
         self.logStateLabels = { }
         for child in self.logFrame.winfo_children():
@@ -338,11 +342,12 @@ class ThisIsTheDashboardApp:
 
     def _updateSwitches(self):
         with open(self.switchFileName) as f:
-            switches = readSwitchConfig(f)
+            switches, optionsets = readSwitchConfig(f)
 
         for child in self.switchFrame.winfo_children():
             child.destroy()
-        self.switchVars = { }
+        self.switchVars = {}
+        self.optionVars = {}
         for switch, enabled in switches.items():
             var = IntVar()
             self.switchVars[switch] = var
@@ -356,12 +361,26 @@ class ThisIsTheDashboardApp:
             if enabled:
                 var.set(1)
             checkbutton.pack(side=LEFT)
+        for optionsetName, optionset in optionsets.items():
+            for option, enabled in optionset.items():
+                var = IntVar()
+                self.optionVars[option] = var
+                if enabled:
+                    var.set(1)
+            setattr(self, optionsetName, StringVar(name = optionsetName))
+            getattr(self, optionsetName).trace("w", lambda name, index, mode: self._setComboVar(name, index, mode))
+            ComboBox = ttk.Combobox(self.switchFrame, textvariable=getattr(self, optionsetName),
+                                      values=[k for k in optionset.keys()])
+            ComboBox.current(0)
+            ComboBox.pack(side=TOP, fill=X)
 
     def _sendSwitchData(self):
         if self.robotConnection == None:
             return
         switches = { }
         for name, var in self.switchVars.items():
+            switches[name] = var.get() == 1
+        for name, var in self.comboVars.items():
             switches[name] = var.get() == 1
         self.robotConnection.sendSwitchData(switches)
 
@@ -419,24 +438,32 @@ def _getLogStateColor(title):
 def readSwitchConfig(file):
     content = file.readlines()
     switchNames = {}
+    optionSets = {}
     for line in content:
         line = line.strip()
         if len(line) == 0:
             continue
-        switchName = line[1:]
         firstCharacter = line[0]
-
-        if firstCharacter == "+":
-            switchEnabled = True
-        elif firstCharacter == "-":
-            switchEnabled = False
+        if firstCharacter == ':':
+            options = line[1:].split(',')
+            optionSets[options[0]] = {}
+            for i, op in enumerate(options):
+                optionSets[options[0]][op] = True if i == 0 else False
         else:
-            switchName = line
-            print("Switch", switchName, "doesn't have enabled state!")
-            switchEnabled = False
+            switchName = line[1:]
+            if firstCharacter == "+":
+                switchEnabled = True
+            elif firstCharacter == "-":
+                switchEnabled = False
+            else:
+                switchName = line
+                print("Switch", switchName, "doesn't have enabled state!")
+                switchEnabled = False
 
-        switchNames[switchName] = switchEnabled
-    return switchNames
+            switchNames[switchName] = switchEnabled
+    return switchNames, optionSets
+
+
 
 if __name__ == "__main__":
     root = Tk()
