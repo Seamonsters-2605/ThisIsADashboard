@@ -442,6 +442,7 @@ def readSwitchConfig(file):
         firstCharacter = line[0]
         if firstCharacter == ':':
             options = line[1:].split(',')
+            options = [o.strip() for o in options]
             optionSets[options[0]] = {}
             for i, op in enumerate(options):
                 optionSets[options[0]][op] = True if i == 0 else False
