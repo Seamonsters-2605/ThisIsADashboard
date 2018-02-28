@@ -8,9 +8,7 @@
 +Vision works
 -Gear sensor works
 -Encoder logging
--Left start
--Center start
--Right start
+:None,Left start,Center start,Right start
 +Cross line left
 -Shoot in auto
 -Shoot left
