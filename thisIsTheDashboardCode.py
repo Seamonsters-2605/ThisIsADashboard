@@ -1,3 +1,4 @@
+
 __author__ = "seamonsters"
 
 import hashlib
@@ -17,8 +18,9 @@ try:
     from PIL import ImageTk
     import numpy as np
     import requests
+
     try:
-        from cv2 import cv2 # idk
+        from cv2 import cv2  # idk
     except:
         import cv2
 except:
@@ -48,7 +50,7 @@ class RobotConnection:
         self.updateCamera()
         logStateNames = self.table.getStringArray('logstatenames', [])
         logStateValues = self.table.getStringArray('logstatevalues', [])
-        logStates = { }
+        logStates = {}
         for i in range(0, len(logStateNames)):
             logStates[logStateNames[i]] = logStateValues[i]
         return logStates
@@ -117,7 +119,7 @@ class TestRobotConnection:
                 'Flywheel mode': "Speed",
                 'Rotation offset': "-0.02304",
                 'Strafe alignment': "0.08555"
-                #,'Test number': str(self.testNumber),
+                # ,'Test number': str(self.testNumber),
                 }
 
     def sendSwitchData(self, switches):
@@ -180,7 +182,6 @@ class CameraStream:
 
 
 class ThisIsTheDashboardApp:
-
     LOG_STATE_TITLE_FONT = ("Segoe UI", 18)
     LOG_STATE_FONT = ("Segoe UI Light", 18)
     IMPORTANT_LOG_STATE_FONT = ("Segoe UI", 18, "bold underline")
@@ -202,7 +203,7 @@ class ThisIsTheDashboardApp:
     def _buildUI(self, root):
         self.root = root
         root.title("Seamonsters")
-        
+
         frame = ttk.Frame(root)
         frame.pack(fill=BOTH, expand=True)
 
@@ -212,33 +213,33 @@ class ThisIsTheDashboardApp:
         ttk.Label(leftFrame, text="2605", style='logo.TLabel').pack(side=TOP)
 
         resetButton = ttk.Button(leftFrame, text="Reset",
-            style='dashboard.TButton', command=self._resetButtonPressed)
+                                 style='dashboard.TButton', command=self._resetButtonPressed)
         resetButton.pack(side=TOP, fill=X)
 
         self.ipComboBoxVar = StringVar()
         ipComboBox = ttk.Combobox(leftFrame, textvariable=self.ipComboBoxVar,
-            values=['10.26.5.2',
-                    socket.gethostbyname(socket.gethostname()),
-                    'roborio-2605-frc.local',
-                    'test'])
+                                  values=['10.26.5.2',
+                                          socket.gethostbyname(socket.gethostname()),
+                                          'roborio-2605-frc.local',
+                                          'test'])
         ipComboBox.current(0)
         ipComboBox.pack(side=TOP, fill=X)
 
         self.progressVar = IntVar()
         self.progress = ttk.Progressbar(leftFrame, mode='determinate',
-            var=self.progressVar, maximum=ThisIsTheDashboardApp.PROGRESS_MAX)
+                                        var=self.progressVar, maximum=ThisIsTheDashboardApp.PROGRESS_MAX)
         self.progress.pack(side=TOP, fill=X)
 
         connectFrame = ttk.Frame(leftFrame)
         connectFrame.pack(side=TOP, fill=X)
 
         self.connectButton = ttk.Button(connectFrame, text="Connect",
-            style='dashboard.TButton', command=self._connectButtonPressed,
-            padding=5)
+                                        style='dashboard.TButton', command=self._connectButtonPressed,
+                                        padding=5)
         self.connectButton.pack(side=LEFT, fill=X, expand=True)
         self.disconnectButton = ttk.Button(connectFrame, text="Disconnect",
-            style='dashboard.TButton', state=DISABLED, padding=5,
-            command=self._disconnectButtonPressed)
+                                           style='dashboard.TButton', state=DISABLED, padding=5,
+                                           command=self._disconnectButtonPressed)
         self.disconnectButton.pack(side=LEFT, fill=X, expand=True)
 
         commandFrame = ttk.Frame(leftFrame)
@@ -249,24 +250,23 @@ class ThisIsTheDashboardApp:
         self.commandEntry.focus()
 
         self.commandButton = ttk.Button(commandFrame, text="Send", width=5,
-            style='dashboard.TButton', command=self._commandButtonPressed,
-            state=DISABLED)
+                                        style='dashboard.TButton', command=self._commandButtonPressed,
+                                        state=DISABLED)
         self.commandButton.pack(side=LEFT)
 
         self.switchFrame = ttk.Frame(leftFrame, borderwidth=3, relief=GROOVE,
                                      padding=8)
         self.switchFrame.pack(side=TOP, fill=X)
 
-        self.switchVars = { }
+        self.switchVars = {}
 
         self.cameraStreamLabel = Label(frame)
         self.cameraStreamLabel.pack(side=LEFT, anchor=N)
 
         self.logFrame = ttk.Frame(frame, padding=(20, 0, 0, 0))
         self.logFrame.pack(side=LEFT, fill=X, expand=True, anchor=N)
-        
-        self.logStateLabels = { }
 
+        self.logStateLabels = {}
 
     def _connectButtonPressed(self):
         ip = self.ipComboBoxVar.get()
@@ -311,13 +311,12 @@ class ThisIsTheDashboardApp:
             return
         self.robotConnection.disconnect()
         self._disconnected()
-
     def _resetButtonPressed(self):
-        self.logStateLabels = { }
+        self.logStateLabels = {}
         for child in self.logFrame.winfo_children():
             child.destroy()
         # taking this out for now, it resets all of the switch values which might be bad
-        #self._updateSwitches()
+        # self._updateSwitches()
         self.cameraStreamLabel.config(image='')
         self.cameraStreamLabel.image = None
 
@@ -348,14 +347,14 @@ class ThisIsTheDashboardApp:
         self._disconnected()
         messagebox.showerror("Dashboard Error", "Connection Failed!")
 
-
     def _updateSwitches(self):
         with open(self.switchFileName) as f:
-            switches = readSwitchConfig(f)
+            switches, optionsets = readSwitchConfig(f)
 
         for child in self.switchFrame.winfo_children():
             child.destroy()
-        self.switchVars = { }
+        self.switchVars = {}
+        self.optionVars = {}
         for switch, enabled in switches.items():
             var = IntVar()
             self.switchVars[switch] = var
@@ -364,18 +363,32 @@ class ThisIsTheDashboardApp:
             checkbuttonFrame.pack(side=TOP, fill=X)
 
             checkbutton = ttk.Checkbutton(checkbuttonFrame, text=switch,
-                variable=var, command=self._sendSwitchData,
-                style='switch.TCheckbutton')
+                                          variable=var, command=self._sendSwitchData,
+                                          style='switch.TCheckbutton')
             if enabled:
                 var.set(1)
             checkbutton.pack(side=LEFT)
+        for optionsetName, optionset in optionsets.items():
+            ComboBox = ttk.Combobox(self.switchFrame,
+                                    values =[k for k in optionset.keys()])
+            ComboBox.bind("<<ComboboxSelected>>", self._sendSwitchData)
+            ComboBox.current(0)
+            ComboBox.pack(side=TOP, fill=X)
+            for optionName, enabled in optionset.items():
+                self.optionVars[optionName] = ComboBox
 
-    def _sendSwitchData(self):
+    def _sendSwitchData(self,event=None):
         if self.robotConnection == None:
             return
-        switches = { }
+        switches = {}
         for name, var in self.switchVars.items():
             switches[name] = var.get() == 1
+
+        for name, var in self.optionVars.items():
+            if name == var.get():
+                switches[name] = True
+            else:
+                switches[name] = False
         self.robotConnection.sendSwitchData(switches)
 
     def _updateLogStates(self):
@@ -405,7 +418,7 @@ class ThisIsTheDashboardApp:
         stateFrame = Frame(self.logFrame, bg=color,
                            borderwidth=3, relief=RAISED)
         stateFrame.pack(side=TOP, fill=X)
-        
+
         titleLabel = ttk.Label(stateFrame, text=name + ": ",
                                font=ThisIsTheDashboardApp.LOG_STATE_TITLE_FONT,
                                background=color)
@@ -420,36 +433,46 @@ class ThisIsTheDashboardApp:
     def _commandButtonPressed(self):
         self.robotConnection.sendCommand(self.commandEntry.get())
 
+
 def _getLogStateColor(title):
     titleHash = hashlib.sha256()
     titleHash.update(title.encode('utf-8'))
     hashValue = titleHash.digest()
     hue = hashValue[0]
-    r,g,b = colorsys.hsv_to_rgb(float(hue)/256.0, 0.6, 1.0)
-    colorHex = '#%02x%02x%02x' % (int(r*255), int(g*255), int(b*255))
+    r, g, b = colorsys.hsv_to_rgb(float(hue) / 256.0, 0.6, 1.0)
+    colorHex = '#%02x%02x%02x' % (int(r * 255), int(g * 255), int(b * 255))
     return colorHex
+
 
 def readSwitchConfig(file):
     content = file.readlines()
     switchNames = {}
+    optionSets = {}
     for line in content:
         line = line.strip()
         if len(line) == 0:
             continue
-        switchName = line[1:]
         firstCharacter = line[0]
-
-        if firstCharacter == "+":
-            switchEnabled = True
-        elif firstCharacter == "-":
-            switchEnabled = False
+        if firstCharacter == ':':
+            options = line[1:].split(',')
+            options = [o.strip() for o in options]
+            optionSets[options[0]] = {}
+            for i, op in enumerate(options):
+                optionSets[options[0]][op] = True if i == 0 else False
         else:
-            switchName = line
-            print("Switch", switchName, "doesn't have enabled state!")
-            switchEnabled = False
+            switchName = line[1:]
+            if firstCharacter == "+":
+                switchEnabled = True
+            elif firstCharacter == "-":
+                switchEnabled = False
+            else:
+                switchName = line
+                print("Switch", switchName, "doesn't have enabled state!")
+                switchEnabled = False
 
-        switchNames[switchName] = switchEnabled
-    return switchNames
+            switchNames[switchName] = switchEnabled
+    return switchNames, optionSets
+
 
 if __name__ == "__main__":
     root = Tk()
