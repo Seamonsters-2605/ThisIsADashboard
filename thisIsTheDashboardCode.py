@@ -79,6 +79,28 @@ class RobotConnection:
         self.table.putStringArray('switchnames', switchNames)
         self.table.putBooleanArray('switchvalues', switchValues)
 
+    def sendNumData(self,Lpause, Rpause):
+        p = {'leftpause':Lpause,'rightpause':Rpause}
+        for k,v in p.items():
+            try:
+                self.table.putNumber(k,float(v))
+            except ValueError:
+                print('this ',k,'value',v,'is not a number!')
+                self.table.putNumber(k,0)
+
+        '''try:
+            lp = self.table.putNumber('leftpause',int(Lpause))
+        except ValueError as l:
+            print('Your entry must be a number')
+            print(l)
+            self.table.putNumber('leftpause',0)
+        try:
+            rp = self.table.putNumber('rightpause',int(Rpause))
+        except ValueError as r:
+            print('Your right entry must be a number')
+            print(r)
+            self.table.putNumber('rightpause',0)'''
+
     def sendCommand(self, command):
         lastId = self.commandTable.getNumber('id', None)
         if lastId == None:
@@ -210,6 +232,9 @@ class ThisIsTheDashboardApp:
         leftFrame = ttk.Frame(frame)
         leftFrame.pack(side=LEFT, fill=Y)
 
+        subFrame = ttk.Frame(frame)
+        subFrame.pack(side=LEFT, fill=Y)
+
         ttk.Label(leftFrame, text="2605", style='logo.TLabel').pack(side=TOP)
 
         resetButton = ttk.Button(leftFrame, text="Reset",
@@ -259,6 +284,23 @@ class ThisIsTheDashboardApp:
         self.switchFrame.pack(side=TOP, fill=X)
 
         self.switchVars = {}
+
+        self.numFrame = ttk.Frame(leftFrame, borderwidth=3, relief=GROOVE,
+                                  padding=8)
+        self.numFrame.pack(side=BOTTOM, fill=X)
+        Label(self.numFrame,text="Left Pause").grid(row=0,column=0)
+        Label(self.numFrame,text="Right Pause").grid(row=1,column=0)
+
+        self.Lpause = ttk.Entry(self.numFrame)
+        self.Lpause.grid(row=0,column=1)
+
+        self.Rpause = ttk.Entry(self.numFrame)
+        self.Rpause.grid(row=1,column=1)
+
+        self.enterButton = ttk.Button(self.numFrame, text='Enter',
+                                 style='dashboard.TButton',
+                                 command=self._enterButtonPressed)
+        self.enterButton.grid(row=1,column=2)
 
         self.cameraStreamLabel = Label(frame)
         self.cameraStreamLabel.pack(side=LEFT, anchor=N)
@@ -319,6 +361,9 @@ class ThisIsTheDashboardApp:
         # self._updateSwitches()
         self.cameraStreamLabel.config(image='')
         self.cameraStreamLabel.image = None
+
+    def _enterButtonPressed(self):
+        self.robotConnection.sendNumData(self.Lpause.get(),self.Rpause.get())
 
     def _connected(self):
         self.connectButton.config(state=DISABLED)
