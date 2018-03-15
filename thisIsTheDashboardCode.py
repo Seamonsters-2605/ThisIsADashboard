@@ -84,6 +84,7 @@ class RobotConnection:
         for k,v in p.items():
             try:
                 self.table.putNumber(k,float(v))
+                print(k, v)
             except ValueError:
                 print('this ',k,'value',v,'is not a number!')
                 self.table.putNumber(k,0)
@@ -133,6 +134,10 @@ class TestRobotConnection:
 
     def sendSwitchData(self, switches):
         print(switches)
+
+    def sendNumData(self, Lpause, Rpause):
+        print("Left pause", Lpause)
+        print("Right pause", Rpause)
 
     def sendCommand(self, command):
         print("Command:", command)
@@ -287,7 +292,7 @@ class ThisIsTheDashboardApp:
         self.enterButton = ttk.Button(self.numFrame, text='Enter',
                                  style='dashboard.TButton',
                                  command=self._enterButtonPressed)
-        self.enterButton.grid(row=1,column=2)
+        self.enterButton.grid(row=2,column=1)
 
         self.cameraStreamLabel = Label(frame)
         self.cameraStreamLabel.pack(side=LEFT, anchor=N)
@@ -321,7 +326,6 @@ class ThisIsTheDashboardApp:
         self.waitCount += 1
         try:
             if self.robotConnection.isConnected():
-                self._sendSwitchData()
                 self._connected()
                 self._updateLogStates()
             else:
@@ -358,6 +362,9 @@ class ThisIsTheDashboardApp:
         self.commandButton.config(state=NORMAL)
         self.progress.stop()
         self.progressVar.set(ThisIsTheDashboardApp.PROGRESS_MAX)
+
+        self._sendSwitchData()
+        self._enterButtonPressed()
 
     def _waiting(self):
         self.connectButton.config(state=DISABLED)
