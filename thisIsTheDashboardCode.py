@@ -88,8 +88,6 @@ class RobotConnection:
                 print('this ',k,'value',v,'is not a number!')
                 self.table.putNumber(k,0)
 
-        
-
     def sendCommand(self, command):
         lastId = self.commandTable.getNumber('id', None)
         if lastId == None:
