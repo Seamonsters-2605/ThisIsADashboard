@@ -88,18 +88,7 @@ class RobotConnection:
                 print('this ',k,'value',v,'is not a number!')
                 self.table.putNumber(k,0)
 
-        '''try:
-            lp = self.table.putNumber('leftpause',int(Lpause))
-        except ValueError as l:
-            print('Your entry must be a number')
-            print(l)
-            self.table.putNumber('leftpause',0)
-        try:
-            rp = self.table.putNumber('rightpause',int(Rpause))
-        except ValueError as r:
-            print('Your right entry must be a number')
-            print(r)
-            self.table.putNumber('rightpause',0)'''
+        
 
     def sendCommand(self, command):
         lastId = self.commandTable.getNumber('id', None)
