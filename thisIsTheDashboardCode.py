@@ -172,15 +172,12 @@ class CameraStream:
         streamBytes = bytes()
         try:
             while not self.stopThread:
-                streamBytes += stream.raw.read(1024)
+                streamBytes += stream.raw.read(256)
                 a = streamBytes.find(b'\xff\xd8')
                 b = streamBytes.find(b'\xff\xd9')
                 if a != -1 and b != -1:
-                    while a != -1 and b != -1:
-                        jpg = streamBytes[a:b + 2]
-                        streamBytes = streamBytes[b + 2:]
-                        a = streamBytes.find(b'\xff\xd8')
-                        b = streamBytes.find(b'\xff\xd9')
+                    jpg = streamBytes[a:b + 2]
+                    streamBytes = streamBytes[b + 2:]
                     image = cv2.imdecode(
                         np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
                     image = Image.fromarray(image)
